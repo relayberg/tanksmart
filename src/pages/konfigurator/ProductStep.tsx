@@ -186,11 +186,6 @@ export default function ProductStep() {
             />
             <span className="text-sm text-muted-foreground">Liter</span>
           </div>
-          {order.quantity >= 3000 && (
-            <p className="text-sm text-success mt-2">
-              ✓ Mengenrabatt: {order.quantity >= 5000 ? "-0,02€" : "-0,01€"} pro Liter
-            </p>
-          )}
         </div>
 
         {/* Additives */}
