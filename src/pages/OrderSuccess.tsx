@@ -7,6 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { CheckCircle, Clock, Mail, CreditCard, Truck, Home, Info } from "lucide-react";
 import { SEO } from "@/components/SEO";
+import { useGoogleAdsConversion } from "@/hooks/useGoogleAdsConversion";
 
 const steps = [
   {
@@ -34,6 +35,10 @@ const steps = [
 export default function OrderSuccess() {
   const [searchParams] = useSearchParams();
   const orderNumber = searchParams.get("bestellnummer") || "TS-00000000-0000";
+  const totalPrice = parseFloat(searchParams.get("total") || "0");
+
+  // Fire Google Ads conversion event
+  useGoogleAdsConversion({ orderNumber, totalPrice });
 
   // Scroll to top on mount
   useEffect(() => {
