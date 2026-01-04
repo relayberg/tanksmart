@@ -66,12 +66,6 @@ export function ConfiguratorLayout({
       <header className="bg-card border-b border-border sticky top-0 z-50">
         <div className="container flex items-center justify-between h-16">
           <Logo />
-          <div className="hidden md:flex items-center gap-2 text-sm text-muted-foreground">
-            <span>Kostenlose Beratung:</span>
-            <a href="tel:0800123456789" className="font-semibold text-primary">
-              0800 123 456 789
-            </a>
-          </div>
         </div>
       </header>
 
