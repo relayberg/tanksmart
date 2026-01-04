@@ -10,7 +10,7 @@ export function Logo({ className = "" }: { className?: string }) {
         </div>
       </div>
       <span className="text-xl font-bold tracking-tight text-foreground">
-        Tank<span className="text-primary">Smart</span>
+        Tank<span className="text-primary">Smart24</span><span className="text-muted-foreground text-sm">.de</span>
       </span>
     </Link>
   );
