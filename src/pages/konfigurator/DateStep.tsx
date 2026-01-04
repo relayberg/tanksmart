@@ -8,6 +8,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { useOrder, TimeSlot } from "@/context/OrderContext";
 import { cn } from "@/lib/utils";
 import { Sun, Sunset, Clock, Info } from "lucide-react";
+import { SEO } from "@/components/SEO";
 
 // German public holidays (fixed dates, some vary by year)
 const getGermanHolidays = (year: number): Date[] => {
@@ -121,13 +122,20 @@ export default function DateStep() {
   };
 
   return (
-    <ConfiguratorLayout
-      step={3}
-      title="Wunschtermin wählen"
-      subtitle="Wählen Sie Ihren bevorzugten Liefertermin"
-      onNext={handleNext}
-      canProceed={canProceed(3)}
-    >
+    <>
+      <SEO
+        title="Liefertermin wählen - Schritt 3"
+        description="Wählen Sie Ihren Wunschtermin für die Heizöl-Lieferung. Flexible Zeitfenster bei TankSmart24."
+        canonical="https://tanksmart24.de/konfigurator/termin"
+        noindex={true}
+      />
+      <ConfiguratorLayout
+        step={3}
+        title="Wunschtermin wählen"
+        subtitle="Wählen Sie Ihren bevorzugten Liefertermin"
+        onNext={handleNext}
+        canProceed={canProceed(3)}
+      >
       <div className="grid lg:grid-cols-2 gap-8 max-w-4xl mx-auto">
         {/* Calendar */}
         <div>
@@ -194,5 +202,6 @@ export default function DateStep() {
         </div>
       </div>
     </ConfiguratorLayout>
+    </>
   );
 }

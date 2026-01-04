@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+import { SEO } from "@/components/SEO";
 
 const AGB = () => {
   useEffect(() => {
@@ -9,6 +10,11 @@ const AGB = () => {
 
   return (
     <div className="min-h-screen flex flex-col">
+      <SEO
+        title="AGB - Allgemeine Geschäftsbedingungen"
+        description="Allgemeine Geschäftsbedingungen der TankSmart24 GmbH. Informationen zu Vertragsschluss, Preisen, Zahlung, Lieferung und Gewährleistung."
+        canonical="https://tanksmart24.de/agb"
+      />
       <Header />
       <main className="flex-1 pt-24 pb-16">
         <div className="container max-w-3xl px-4">

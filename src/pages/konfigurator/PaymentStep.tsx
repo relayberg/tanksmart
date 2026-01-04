@@ -9,6 +9,7 @@ import { useOrder } from "@/context/OrderContext";
 import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Droplet, User, MapPin, Calendar, CreditCard, Loader2 } from "lucide-react";
+import { SEO } from "@/components/SEO";
 
 export default function PaymentStep() {
   const navigate = useNavigate();
@@ -97,14 +98,21 @@ export default function PaymentStep() {
   };
 
   return (
-    <ConfiguratorLayout
-      step={6}
-      title="Bestellung abschließen"
-      subtitle="Überprüfen Sie Ihre Bestellung und schließen Sie den Kauf ab"
-      onNext={handleSubmit}
-      nextLabel={isSubmitting ? "Wird verarbeitet..." : "Jetzt kostenpflichtig bestellen"}
-      canProceed={canProceed(6) && !isSubmitting}
-    >
+    <>
+      <SEO
+        title="Bestellung abschließen - Schritt 6"
+        description="Überprüfen Sie Ihre Heizöl-Bestellung und schließen Sie den Kauf sicher ab. Transparente Preise bei TankSmart24."
+        canonical="https://tanksmart24.de/konfigurator/zahlung"
+        noindex={true}
+      />
+      <ConfiguratorLayout
+        step={6}
+        title="Bestellung abschließen"
+        subtitle="Überprüfen Sie Ihre Bestellung und schließen Sie den Kauf ab"
+        onNext={handleSubmit}
+        nextLabel={isSubmitting ? "Wird verarbeitet..." : "Jetzt kostenpflichtig bestellen"}
+        canProceed={canProceed(6) && !isSubmitting}
+      >
       <div className="space-y-6">
         {/* Order Summary */}
         <Card>
@@ -290,5 +298,6 @@ export default function PaymentStep() {
         </div>
       </div>
     </ConfiguratorLayout>
+    </>
   );
 }

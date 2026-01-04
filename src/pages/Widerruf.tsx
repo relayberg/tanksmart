@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+import { SEO } from "@/components/SEO";
 
 const Widerruf = () => {
   useEffect(() => {
@@ -9,6 +10,11 @@ const Widerruf = () => {
 
   return (
     <div className="min-h-screen flex flex-col">
+      <SEO
+        title="Widerrufsbelehrung"
+        description="Widerrufsbelehrung für Heizölbestellungen bei TankSmart24. Informationen zum Widerrufsrecht und Muster-Widerrufsformular."
+        canonical="https://tanksmart24.de/widerruf"
+      />
       <Header />
       <main className="flex-1 pt-24 pb-16">
         <div className="container max-w-3xl px-4">

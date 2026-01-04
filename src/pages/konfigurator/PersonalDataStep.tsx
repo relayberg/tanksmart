@@ -5,6 +5,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useOrder, Salutation } from "@/context/OrderContext";
 import { cn } from "@/lib/utils";
+import { SEO } from "@/components/SEO";
 
 const salutations: { value: Salutation; label: string }[] = [
   { value: "herr", label: "Herr" },
@@ -25,13 +26,20 @@ export default function PersonalDataStep() {
   const isValidPhone = order.phone.length >= 6;
 
   return (
-    <ConfiguratorLayout
-      step={5}
-      title="Persönliche Daten"
-      subtitle="Geben Sie Ihre Kontaktdaten für die Bestellung ein"
-      onNext={handleNext}
-      canProceed={canProceed(5)}
-    >
+    <>
+      <SEO
+        title="Persönliche Daten - Schritt 5"
+        description="Geben Sie Ihre Kontaktdaten für die Heizöl-Bestellung ein. Sicher und vertraulich bei TankSmart24."
+        canonical="https://tanksmart24.de/konfigurator/daten"
+        noindex={true}
+      />
+      <ConfiguratorLayout
+        step={5}
+        title="Persönliche Daten"
+        subtitle="Geben Sie Ihre Kontaktdaten für die Bestellung ein"
+        onNext={handleNext}
+        canProceed={canProceed(5)}
+      >
       <div className="space-y-8">
         {/* Personal Data */}
         <div>
@@ -234,5 +242,6 @@ export default function PersonalDataStep() {
         </div>
       </div>
     </ConfiguratorLayout>
+    </>
   );
 }

@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { useOrder, OilType, AdditiveType } from "@/context/OrderContext";
 import { cn } from "@/lib/utils";
 import { Droplet, Sparkles, Leaf, Ban, Snowflake, Shield, Package } from "lucide-react";
+import { SEO } from "@/components/SEO";
 
 const oilTypes: { value: OilType; icon: typeof Droplet; title: string; description: string }[] = [
   {
@@ -85,14 +86,21 @@ export default function ProductStep() {
   };
 
   return (
-    <ConfiguratorLayout
-      step={1}
-      title="Produkt auswählen"
-      subtitle="Wählen Sie Ihre gewünschte Heizölsorte und Menge"
-      onNext={handleNext}
-      canProceed={canProceed(1)}
-      showBack={false}
-    >
+    <>
+      <SEO
+        title="Heizöl Produkt auswählen - Schritt 1"
+        description="Wählen Sie Ihre Heizölsorte und Menge. Standard, Premium oder Bio-Heizöl mit optionalen Additiven bei TankSmart24."
+        canonical="https://tanksmart24.de/konfigurator/produkt"
+        noindex={true}
+      />
+      <ConfiguratorLayout
+        step={1}
+        title="Produkt auswählen"
+        subtitle="Wählen Sie Ihre gewünschte Heizölsorte und Menge"
+        onNext={handleNext}
+        canProceed={canProceed(1)}
+        showBack={false}
+      >
       <div className="space-y-8">
         {/* Postal Code */}
         <div>
@@ -216,5 +224,6 @@ export default function ProductStep() {
         </div>
       </div>
     </ConfiguratorLayout>
+    </>
   );
 }

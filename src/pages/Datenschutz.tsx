@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+import { SEO } from "@/components/SEO";
 
 const Datenschutz = () => {
   useEffect(() => {
@@ -9,6 +10,11 @@ const Datenschutz = () => {
 
   return (
     <div className="min-h-screen flex flex-col">
+      <SEO
+        title="Datenschutzerklärung"
+        description="Datenschutzerklärung der TankSmart24 GmbH. Erfahren Sie, wie wir Ihre personenbezogenen Daten erheben, verarbeiten und schützen."
+        canonical="https://tanksmart24.de/datenschutz"
+      />
       <Header />
       <main className="flex-1 pt-24 pb-16">
         <div className="container max-w-3xl px-4">
