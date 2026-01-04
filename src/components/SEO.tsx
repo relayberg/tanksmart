@@ -10,14 +10,15 @@ interface SEOProps {
 }
 
 const BASE_URL = "https://tanksmart24.de";
-const DEFAULT_IMAGE = "https://tanksmart24.de/og-image.png";
+const DEFAULT_IMAGE = `${BASE_URL}/og-image.png`;
 
-// Organization JSON-LD - same on all pages for consistency (no cloaking)
+// Organization JSON-LD - consistent on all pages (no cloaking risk)
 const organizationJsonLd = {
   "@context": "https://schema.org",
   "@type": "Organization",
   "@id": `${BASE_URL}/#organization`,
-  name: "TankSmart24 GmbH",
+  name: "S-Tank GmbH",
+  alternateName: "TankSmart24",
   url: BASE_URL,
   logo: `${BASE_URL}/logo.png`,
   contactPoint: {
@@ -33,28 +34,18 @@ const organizationJsonLd = {
     postalCode: "12345",
     addressCountry: "DE",
   },
-  sameAs: [],
 };
 
-// WebSite JSON-LD with SearchAction
+// WebSite JSON-LD
 const websiteJsonLd = {
   "@context": "https://schema.org",
   "@type": "WebSite",
   "@id": `${BASE_URL}/#website`,
   url: BASE_URL,
-  name: "TankSmart24.de - Heizöl Preisvergleich",
-  description:
-    "Deutschlands führendes Heizöl-Preisvergleichsportal. Vergleichen Sie über 200 geprüfte Anbieter.",
+  name: "TankSmart24.de",
+  description: "Heizöl Preisvergleich - Vergleichen Sie Anbieter und sparen Sie bei Ihrer Heizölbestellung.",
   publisher: {
     "@id": `${BASE_URL}/#organization`,
-  },
-  potentialAction: {
-    "@type": "SearchAction",
-    target: {
-      "@type": "EntryPoint",
-      urlTemplate: `${BASE_URL}/konfigurator/produkt?plz={search_term_string}`,
-    },
-    "query-input": "required name=search_term_string",
   },
 };
 
@@ -75,7 +66,6 @@ export const SEO = ({
     <Helmet>
       {/* Primary Meta Tags */}
       <title>{fullTitle}</title>
-      <meta name="title" content={fullTitle} />
       <meta name="description" content={description} />
       <link rel="canonical" href={canonicalUrl} />
 
@@ -85,7 +75,7 @@ export const SEO = ({
         content={noindex ? "noindex, nofollow" : "index, follow"}
       />
 
-      {/* Open Graph / Facebook */}
+      {/* Open Graph */}
       <meta property="og:type" content={type} />
       <meta property="og:url" content={canonicalUrl} />
       <meta property="og:title" content={fullTitle} />
@@ -96,7 +86,6 @@ export const SEO = ({
 
       {/* Twitter */}
       <meta name="twitter:card" content="summary_large_image" />
-      <meta name="twitter:url" content={canonicalUrl} />
       <meta name="twitter:title" content={fullTitle} />
       <meta name="twitter:description" content={description} />
       <meta name="twitter:image" content={image} />

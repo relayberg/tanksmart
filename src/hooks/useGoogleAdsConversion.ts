@@ -18,7 +18,6 @@ export function useGoogleAdsConversion({ orderNumber, totalPrice }: ConversionDa
     
     async function fireConversion() {
       try {
-        // Fetch Google Ads configuration from database
         const { data: integration } = await supabase
           .from("api_integrations")
           .select("config, is_active")
@@ -26,7 +25,6 @@ export function useGoogleAdsConversion({ orderNumber, totalPrice }: ConversionDa
           .single();
 
         if (!integration?.is_active) {
-          console.log("Google Ads tracking is not active");
           return;
         }
 
@@ -35,22 +33,17 @@ export function useGoogleAdsConversion({ orderNumber, totalPrice }: ConversionDa
         const conversionLabel = config?.conversion_label;
 
         if (!conversionId) {
-          console.log("Google Ads conversion ID not configured");
           return;
         }
 
-        // Check if gtag is available
         if (typeof window.gtag !== "function") {
-          console.warn("gtag is not loaded");
           return;
         }
 
-        // Build the send_to parameter
         const sendTo = conversionLabel 
           ? `${conversionId}/${conversionLabel}`
           : conversionId;
 
-        // Fire the conversion event
         window.gtag("event", "conversion", {
           send_to: sendTo,
           value: totalPrice,
@@ -58,10 +51,9 @@ export function useGoogleAdsConversion({ orderNumber, totalPrice }: ConversionDa
           transaction_id: orderNumber,
         });
 
-        console.log("Google Ads conversion fired:", { sendTo, totalPrice, orderNumber });
         hasFired.current = true;
-      } catch (error) {
-        console.error("Error firing Google Ads conversion:", error);
+      } catch {
+        // Silently fail - tracking is non-critical
       }
     }
 

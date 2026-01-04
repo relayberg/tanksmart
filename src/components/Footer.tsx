@@ -82,7 +82,7 @@ export function Footer() {
               <li className="flex items-start gap-3 text-sm text-secondary-foreground/70">
                 <MapPin className="w-4 h-4 text-primary mt-0.5 shrink-0" />
                 <span>
-                  TankSmart24 GmbH<br />
+                  S-Tank GmbH<br />
                   Musterstraße 123<br />
                   12345 Musterstadt
                 </span>
@@ -93,7 +93,7 @@ export function Footer() {
 
         <div className="border-t border-secondary-foreground/10 mt-8 md:mt-12 pt-6 md:pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="text-sm text-secondary-foreground/50 text-center md:text-left">
-            © {currentYear} TankSmart24.de. Alle Rechte vorbehalten.
+            © {currentYear} S-Tank GmbH. Alle Rechte vorbehalten.
           </p>
           <div className="flex items-center gap-4 md:gap-6 flex-wrap justify-center">
             <span className="text-xs text-secondary-foreground/40">SSL-verschlüsselt</span>
