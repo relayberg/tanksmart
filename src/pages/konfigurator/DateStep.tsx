@@ -128,20 +128,20 @@ export default function DateStep() {
       onNext={handleNext}
       canProceed={canProceed(3)}
     >
-      <div className="grid lg:grid-cols-2 gap-8">
+      <div className="grid lg:grid-cols-2 gap-8 max-w-4xl mx-auto">
         {/* Calendar */}
         <div>
           <label className="block text-sm font-semibold text-foreground mb-3">
             Lieferdatum
           </label>
-          <Card className="p-4">
+          <Card className="p-4 w-fit">
             <Calendar
               mode="single"
               selected={order.deliveryDate || undefined}
               onSelect={(date) => updateOrder({ deliveryDate: date || null })}
               disabled={isDateDisabled}
               locale={de}
-              className="pointer-events-auto"
+              className="pointer-events-auto p-0"
               fromDate={minDate}
             />
           </Card>
