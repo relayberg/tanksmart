@@ -9,6 +9,7 @@ import { useAddressAutocomplete } from "@/hooks/useAddressAutocomplete";
 import { StreetAutocomplete } from "@/components/ui/street-autocomplete";
 import { cn } from "@/lib/utils";
 import { AlertCircle, Ruler, Loader2, Check } from "lucide-react";
+import { SEO } from "@/components/SEO";
 import {
   Select,
   SelectContent,
@@ -100,13 +101,20 @@ export default function DeliveryStep() {
   };
 
   return (
-    <ConfiguratorLayout
-      step={4}
-      title="Lieferdetails"
-      subtitle="Geben Sie die genaue Lieferadresse und Zufahrtsinformationen an"
-      onNext={handleNext}
-      canProceed={canProceed(4)}
-    >
+    <>
+      <SEO
+        title="Lieferdetails angeben - Schritt 4"
+        description="Geben Sie Ihre Lieferadresse und Zufahrtsinformationen für die Heizöl-Lieferung an. Schnell und einfach bei TankSmart24."
+        canonical="https://tanksmart24.de/konfigurator/lieferung"
+        noindex={true}
+      />
+      <ConfiguratorLayout
+        step={4}
+        title="Lieferdetails"
+        subtitle="Geben Sie die genaue Lieferadresse und Zufahrtsinformationen an"
+        onNext={handleNext}
+        canProceed={canProceed(4)}
+      >
       <div className="space-y-8">
         {/* Address */}
         <div>
@@ -298,5 +306,6 @@ export default function DeliveryStep() {
         </div>
       </div>
     </ConfiguratorLayout>
+    </>
   );
 }

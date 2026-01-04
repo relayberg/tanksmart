@@ -7,6 +7,7 @@ import { useOrder, PROVIDERS } from "@/context/OrderContext";
 import { useMarketPrice, calculatePriceWithMarket } from "@/hooks/useMarketPrice";
 import { cn } from "@/lib/utils";
 import { Star, Clock, Award, Check, ArrowRight, Loader2 } from "lucide-react";
+import { SEO } from "@/components/SEO";
 
 // Provider logos
 import hoyerLogo from "@/assets/providers/hoyer.png";
@@ -45,16 +46,24 @@ export default function ProviderStep() {
 
   if (isLoading) {
     return (
-      <ConfiguratorLayout
-        step={2}
-        title="Anbieter vergleichen"
-        subtitle="Preise werden geladen..."
-        canProceed={false}
-      >
-        <div className="flex items-center justify-center py-20">
-          <Loader2 className="w-8 h-8 animate-spin text-primary" />
-        </div>
-      </ConfiguratorLayout>
+      <>
+        <SEO
+          title="Heizöl Anbieter vergleichen - Schritt 2"
+          description="Vergleichen Sie geprüfte Heizöl-Anbieter in Ihrer Region. Beste Preise und schnelle Lieferung bei TankSmart24."
+          canonical="https://tanksmart24.de/konfigurator/anbieter"
+          noindex={true}
+        />
+        <ConfiguratorLayout
+          step={2}
+          title="Anbieter vergleichen"
+          subtitle="Preise werden geladen..."
+          canProceed={false}
+        >
+          <div className="flex items-center justify-center py-20">
+            <Loader2 className="w-8 h-8 animate-spin text-primary" />
+          </div>
+        </ConfiguratorLayout>
+      </>
     );
   }
 
@@ -80,14 +89,21 @@ export default function ProviderStep() {
   };
 
   return (
-    <ConfiguratorLayout
-      step={2}
-      title="Anbieter vergleichen"
-      subtitle={`${order.quantity.toLocaleString("de-DE")} Liter ${
-        order.oilType === "premium" ? "Premium-" : order.oilType === "bio" ? "Bio-" : ""
-      }Heizöl für PLZ ${order.postalCode}`}
-      canProceed={false}
-    >
+    <>
+      <SEO
+        title="Heizöl Anbieter vergleichen - Schritt 2"
+        description="Vergleichen Sie geprüfte Heizöl-Anbieter in Ihrer Region. Beste Preise und schnelle Lieferung bei TankSmart24."
+        canonical="https://tanksmart24.de/konfigurator/anbieter"
+        noindex={true}
+      />
+      <ConfiguratorLayout
+        step={2}
+        title="Anbieter vergleichen"
+        subtitle={`${order.quantity.toLocaleString("de-DE")} Liter ${
+          order.oilType === "premium" ? "Premium-" : order.oilType === "bio" ? "Bio-" : ""
+        }Heizöl für PLZ ${order.postalCode}`}
+        canProceed={false}
+      >
       <div className="space-y-3">
         {providersWithPrices.map((provider, index) => {
           const isSelected = order.provider?.id === provider.id;
@@ -231,5 +247,6 @@ export default function ProviderStep() {
         </p>
       </div>
     </ConfiguratorLayout>
+    </>
   );
 }

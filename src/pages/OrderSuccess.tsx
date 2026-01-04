@@ -6,6 +6,7 @@ import { Footer } from "@/components/Footer";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { CheckCircle, Clock, Mail, CreditCard, Truck, Home, Info } from "lucide-react";
+import { SEO } from "@/components/SEO";
 
 const steps = [
   {
@@ -41,6 +42,12 @@ export default function OrderSuccess() {
 
   return (
     <div className="min-h-screen flex flex-col">
+      <SEO
+        title="Bestellung erfolgreich"
+        description="Ihre Heizölbestellung bei TankSmart24 war erfolgreich. Sie erhalten in Kürze eine Bestellbestätigung per E-Mail."
+        canonical="https://tanksmart24.de/bestellung-erfolgreich"
+        noindex={true}
+      />
       <Header />
       <main className="flex-1 pt-24 pb-16 bg-background">
         <div className="container max-w-3xl">
