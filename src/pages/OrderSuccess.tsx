@@ -109,7 +109,7 @@ export default function OrderSuccess() {
                 <div>
                   <h3 className="font-semibold text-foreground mb-2">Alles aus einer Hand</h3>
                   <p className="text-sm text-muted-foreground">
-                    Die komplette Zahlungsabwicklung erfolgt über TankSmart – Sie zahlen nicht 
+                    Die komplette Zahlungsabwicklung erfolgt über TankSmart24.de – Sie zahlen nicht 
                     direkt an den Lieferanten. Bei Fragen sind wir Ihr einziger Ansprechpartner.
                   </p>
                 </div>

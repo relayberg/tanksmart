@@ -6,7 +6,7 @@ const Datenschutz = () => {
     <div className="min-h-screen flex flex-col">
       <Header />
       <main className="flex-1 pt-24 pb-16">
-        <div className="container max-w-3xl">
+        <div className="container max-w-3xl px-4">
           <h1 className="text-display-sm text-foreground mb-8">Datenschutzerklärung</h1>
           
           <div className="prose prose-slate max-w-none space-y-8">
@@ -23,11 +23,11 @@ const Datenschutz = () => {
             <section>
               <h2 className="text-xl font-semibold mb-3">2. Verantwortliche Stelle</h2>
               <p className="text-muted-foreground">
-                TankSmart GmbH<br />
+                TankSmart24 GmbH<br />
                 Musterstraße 123<br />
                 12345 Musterstadt<br /><br />
                 Telefon: 0800 123 456 789<br />
-                E-Mail: datenschutz@tanksmart.de
+                E-Mail: datenschutz@tanksmart24.de
               </p>
             </section>
 

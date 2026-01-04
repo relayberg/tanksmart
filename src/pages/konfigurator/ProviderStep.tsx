@@ -151,7 +151,7 @@ export default function ProviderStep() {
       <div className="mt-6 p-4 bg-accent/50 rounded-xl border border-primary/20">
         <p className="text-sm text-foreground">
           <strong>Hinweis:</strong> Alle Preise sind Endpreise inkl. MwSt. und Lieferung. 
-          Die Zahlungsabwicklung erfolgt komplett über TankSmart – Sie zahlen nicht direkt an den Lieferanten.
+          Die Zahlungsabwicklung erfolgt komplett über TankSmart24.de – Sie zahlen nicht direkt an den Lieferanten.
         </p>
       </div>
     </ConfiguratorLayout>

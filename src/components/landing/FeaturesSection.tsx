@@ -31,7 +31,7 @@ export function FeaturesSection() {
           className="text-center mb-12"
         >
           <h2 className="text-display-sm text-foreground mb-4">
-            Warum TankSmart?
+            Warum TankSmart24.de?
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
             Wir machen den Heizölkauf einfach, sicher und günstig.

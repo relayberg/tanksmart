@@ -79,7 +79,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
               <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
                 <span className="text-primary-foreground font-bold text-sm">TS</span>
               </div>
-              <span className="font-semibold">TankSmart Admin</span>
+              <span className="font-semibold">TankSmart24 Admin</span>
             </Link>
             <button
               onClick={() => setSidebarOpen(false)}
@@ -189,7 +189,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
           >
             <Menu className="h-6 w-6" />
           </button>
-          <span className="ml-4 font-semibold">TankSmart Admin</span>
+          <span className="ml-4 font-semibold">TankSmart24 Admin</span>
         </header>
 
         {/* Page content */}

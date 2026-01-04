@@ -7,10 +7,10 @@ export function Footer() {
 
   return (
     <footer className="bg-secondary text-secondary-foreground">
-      <div className="container py-16">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
+      <div className="container py-12 md:py-16">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 md:gap-12">
           {/* Brand */}
-          <div className="space-y-4">
+          <div className="space-y-4 sm:col-span-2 lg:col-span-1">
             <Logo className="brightness-0 invert" />
             <p className="text-sm text-secondary-foreground/70 leading-relaxed">
               Deutschlands führendes Heizöl-Preisvergleichsportal. Sparen Sie bis zu 30% 
@@ -72,17 +72,17 @@ export function Footer() {
             <h4 className="font-semibold mb-4">Kontakt</h4>
             <ul className="space-y-3">
               <li className="flex items-center gap-3 text-sm text-secondary-foreground/70">
-                <Phone className="w-4 h-4 text-primary" />
+                <Phone className="w-4 h-4 text-primary shrink-0" />
                 0800 123 456 789
               </li>
               <li className="flex items-center gap-3 text-sm text-secondary-foreground/70">
-                <Mail className="w-4 h-4 text-primary" />
-                info@tanksmart.de
+                <Mail className="w-4 h-4 text-primary shrink-0" />
+                info@tanksmart24.de
               </li>
               <li className="flex items-start gap-3 text-sm text-secondary-foreground/70">
-                <MapPin className="w-4 h-4 text-primary mt-0.5" />
+                <MapPin className="w-4 h-4 text-primary mt-0.5 shrink-0" />
                 <span>
-                  TankSmart GmbH<br />
+                  TankSmart24 GmbH<br />
                   Musterstraße 123<br />
                   12345 Musterstadt
                 </span>
@@ -91,11 +91,11 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="border-t border-secondary-foreground/10 mt-12 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
-          <p className="text-sm text-secondary-foreground/50">
-            © {currentYear} TankSmart. Alle Rechte vorbehalten.
+        <div className="border-t border-secondary-foreground/10 mt-8 md:mt-12 pt-6 md:pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
+          <p className="text-sm text-secondary-foreground/50 text-center md:text-left">
+            © {currentYear} TankSmart24.de. Alle Rechte vorbehalten.
           </p>
-          <div className="flex items-center gap-6">
+          <div className="flex items-center gap-4 md:gap-6 flex-wrap justify-center">
             <span className="text-xs text-secondary-foreground/40">SSL-verschlüsselt</span>
             <span className="text-xs text-secondary-foreground/40">Käuferschutz</span>
             <span className="text-xs text-secondary-foreground/40">Geprüfte Qualität</span>

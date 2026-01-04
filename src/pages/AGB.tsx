@@ -6,7 +6,7 @@ const AGB = () => {
     <div className="min-h-screen flex flex-col">
       <Header />
       <main className="flex-1 pt-24 pb-16">
-        <div className="container max-w-3xl">
+        <div className="container max-w-3xl px-4">
           <h1 className="text-display-sm text-foreground mb-8">Allgemeine Geschäftsbedingungen</h1>
           
           <div className="prose prose-slate max-w-none space-y-8">
@@ -14,7 +14,7 @@ const AGB = () => {
               <h2 className="text-xl font-semibold mb-3">§ 1 Geltungsbereich</h2>
               <p className="text-muted-foreground">
                 Diese Allgemeinen Geschäftsbedingungen gelten für alle Verträge, die über die 
-                Plattform TankSmart zwischen der TankSmart GmbH und dem Kunden geschlossen werden.
+                Plattform TankSmart24.de zwischen der TankSmart24 GmbH und dem Kunden geschlossen werden.
               </p>
             </section>
 
@@ -51,7 +51,7 @@ const AGB = () => {
               <h2 className="text-xl font-semibold mb-3">§ 5 Eigentumsvorbehalt</h2>
               <p className="text-muted-foreground">
                 Die gelieferte Ware bleibt bis zur vollständigen Bezahlung Eigentum der 
-                TankSmart GmbH.
+                TankSmart24 GmbH.
               </p>
             </section>
 
@@ -67,7 +67,7 @@ const AGB = () => {
               <h2 className="text-xl font-semibold mb-3">§ 7 Schlussbestimmungen</h2>
               <p className="text-muted-foreground">
                 Es gilt das Recht der Bundesrepublik Deutschland. Gerichtsstand ist, soweit 
-                gesetzlich zulässig, der Sitz der TankSmart GmbH.
+                gesetzlich zulässig, der Sitz der TankSmart24 GmbH.
               </p>
             </section>
           </div>

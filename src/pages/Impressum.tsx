@@ -6,14 +6,14 @@ const Impressum = () => {
     <div className="min-h-screen flex flex-col">
       <Header />
       <main className="flex-1 pt-24 pb-16">
-        <div className="container max-w-3xl">
+        <div className="container max-w-3xl px-4">
           <h1 className="text-display-sm text-foreground mb-8">Impressum</h1>
           
           <div className="prose prose-slate max-w-none space-y-6">
             <section>
               <h2 className="text-xl font-semibold mb-3">Angaben gemäß § 5 TMG</h2>
               <p className="text-muted-foreground">
-                TankSmart GmbH<br />
+                TankSmart24 GmbH<br />
                 Musterstraße 123<br />
                 12345 Musterstadt<br />
                 Deutschland
@@ -31,8 +31,8 @@ const Impressum = () => {
               <h2 className="text-xl font-semibold mb-3">Kontakt</h2>
               <p className="text-muted-foreground">
                 Telefon: 0800 123 456 789 (kostenlos)<br />
-                E-Mail: info@tanksmart.de<br />
-                Website: www.tanksmart.de
+                E-Mail: info@tanksmart24.de<br />
+                Website: www.tanksmart24.de
               </p>
             </section>
 

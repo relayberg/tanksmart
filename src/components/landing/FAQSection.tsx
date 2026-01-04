@@ -12,7 +12,7 @@ const faqs = [
     answer: "Geben Sie einfach Ihre Postleitzahl und die gewünschte Liefermenge ein. Wir zeigen Ihnen sofort die aktuellen Preise aller verfügbaren Anbieter in Ihrer Region. Sie wählen das beste Angebot aus und können direkt online bestellen.",
   },
   {
-    question: "Ist die Nutzung von TankSmart kostenlos?",
+    question: "Ist die Nutzung von TankSmart24.de kostenlos?",
     answer: "Ja, die Nutzung unseres Preisvergleichs ist für Sie komplett kostenlos und unverbindlich. Sie zahlen nur den Preis für das bestellte Heizöl – ohne versteckte Gebühren.",
   },
   {
