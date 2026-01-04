@@ -57,6 +57,9 @@ export interface OrderState {
   // Step 6 - Terms
   acceptedTerms: boolean;
   acceptedPrivacy: boolean;
+  
+  // Tracking
+  gclid: string;
 }
 
 interface OrderContextType {
@@ -97,6 +100,7 @@ const initialState: OrderState = {
   remarks: "",
   acceptedTerms: false,
   acceptedPrivacy: false,
+  gclid: "",
 };
 
 const OrderContext = createContext<OrderContextType | undefined>(undefined);

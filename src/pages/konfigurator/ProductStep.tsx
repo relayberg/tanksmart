@@ -7,6 +7,7 @@ import { useOrder, OilType, AdditiveType } from "@/context/OrderContext";
 import { cn } from "@/lib/utils";
 import { Droplet, Sparkles, Leaf, Ban, Snowflake, Shield, Package } from "lucide-react";
 import { SEO } from "@/components/SEO";
+import { useGclid } from "@/hooks/useGclid";
 
 const oilTypes: { value: OilType; icon: typeof Droplet; title: string; description: string }[] = [
   {
@@ -62,6 +63,9 @@ export default function ProductStep() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { order, updateOrder, setCurrentStep, canProceed } = useOrder();
+  
+  // Capture GCLID from URL if present
+  useGclid();
 
   // Initialize from URL params
   useEffect(() => {

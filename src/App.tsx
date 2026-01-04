@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { OrderProvider } from "@/context/OrderContext";
 import { AdminAuthProvider } from "@/context/AdminAuthContext";
+import { GtagLoader } from "@/components/GtagLoader";
 import Index from "./pages/Index";
 import Impressum from "./pages/Impressum";
 import Datenschutz from "./pages/Datenschutz";
@@ -44,6 +45,7 @@ const App = () => (
           <Sonner />
           <BrowserRouter>
             <ScrollToTop />
+            <GtagLoader />
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/impressum" element={<Impressum />} />

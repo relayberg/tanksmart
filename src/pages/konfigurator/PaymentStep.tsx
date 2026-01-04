@@ -68,6 +68,7 @@ export default function PaymentStep() {
           deliveryNotes: order.deliveryNotes,
           hoseLength: order.hoseLength,
           truckAccessible: order.truckAccessible,
+          gclid: order.gclid,
         },
       });
 
@@ -80,11 +81,14 @@ export default function PaymentStep() {
         throw new Error(data?.error || 'Unbekannter Fehler');
       }
 
+      // Store totalPrice for conversion tracking before resetting order
+      const finalTotalPrice = order.totalPrice;
+
       // Reset order state
       resetOrder();
 
-      // Navigate to success page
-      navigate(`/bestellung-erfolgreich?bestellnummer=${data.orderNumber}`);
+      // Navigate to success page with order number and total for conversion tracking
+      navigate(`/bestellung-erfolgreich?bestellnummer=${data.orderNumber}&total=${finalTotalPrice}`);
     } catch (error) {
       console.error('Submit error:', error);
       toast({
