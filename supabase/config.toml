@@ -1,1 +1,13 @@
 project_id = "ychnpidghvxzcaqvtigw"
+
+[functions.admin-auth]
+verify_jwt = false
+
+[functions.create-order]
+verify_jwt = false
+
+[functions.send-email]
+verify_jwt = false
+
+[functions.seven-api]
+verify_jwt = false
