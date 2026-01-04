@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { CheckCircle, Shield, Truck, ArrowRight, Loader2 } from "lucide-react";
+import { CheckCircle, Shield, Truck, ArrowRight, Loader2, X } from "lucide-react";
+import { useAddressAutocomplete } from "@/hooks/useAddressAutocomplete";
 
 const quantityOptions = [1000, 2000, 3000, 5000];
 
@@ -13,27 +13,30 @@ export function PriceSearchForm() {
   const [postalCode, setPostalCode] = useState("");
   const [quantity, setQuantity] = useState(2000);
   const [customQuantity, setCustomQuantity] = useState("");
-  const [isValidating, setIsValidating] = useState(false);
-  const [isValid, setIsValid] = useState<boolean | null>(null);
 
-  const handlePostalCodeChange = (value: string) => {
+  const {
+    isLoadingLocalities,
+    localityError,
+    localityValid,
+    fetchLocalitiesByPostalCode,
+    resetLocalities,
+  } = useAddressAutocomplete();
+
+  const handlePostalCodeChange = async (value: string) => {
     const cleaned = value.replace(/\D/g, "").slice(0, 5);
     setPostalCode(cleaned);
     
     if (cleaned.length === 5) {
-      setIsValidating(true);
-      // Simulate validation - in real app, call PLZ API
-      setTimeout(() => {
-        setIsValidating(false);
-        setIsValid(true);
-      }, 500);
+      await fetchLocalitiesByPostalCode(cleaned);
     } else {
-      setIsValid(null);
+      resetLocalities();
     }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!localityValid) return;
+    
     const finalQuantity = customQuantity ? parseInt(customQuantity) : quantity;
     navigate(`/konfigurator/produkt?plz=${postalCode}&menge=${finalQuantity}`);
   };
@@ -58,13 +61,17 @@ export function PriceSearchForm() {
                 value={postalCode}
                 onChange={(e) => handlePostalCodeChange(e.target.value)}
                 inputSize="lg"
-                className="pr-10"
+                className={`pr-10 ${localityError ? "border-destructive" : localityValid ? "border-success" : ""}`}
               />
               <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                {isValidating && <Loader2 className="w-5 h-5 text-muted-foreground animate-spin" />}
-                {isValid === true && <CheckCircle className="w-5 h-5 text-success" />}
+                {isLoadingLocalities && <Loader2 className="w-5 h-5 text-muted-foreground animate-spin" />}
+                {!isLoadingLocalities && localityValid && <CheckCircle className="w-5 h-5 text-success" />}
+                {!isLoadingLocalities && localityError && <X className="w-5 h-5 text-destructive" />}
               </div>
             </div>
+            {localityError && (
+              <p className="text-sm text-destructive">{localityError}</p>
+            )}
           </div>
 
           {/* Quantity Quick Select */}
@@ -110,7 +117,13 @@ export function PriceSearchForm() {
           </div>
 
           {/* Submit */}
-          <Button type="submit" variant="hero" size="xl" className="w-full">
+          <Button 
+            type="submit" 
+            variant="hero" 
+            size="xl" 
+            className="w-full"
+            disabled={!localityValid}
+          >
             Preise vergleichen
             <ArrowRight className="w-5 h-5" />
           </Button>
