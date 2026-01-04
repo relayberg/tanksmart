@@ -13,8 +13,9 @@ import {
 } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 import { supabase } from '@/integrations/supabase/client';
-import { Search, Loader2, Trash2, Euro, Calendar, CreditCard, AlertCircle } from 'lucide-react';
+import { Search, Loader2, Trash2, Euro, Calendar, CreditCard, AlertCircle, Mail, MessageSquare } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface Order {
   id: string;
@@ -27,6 +28,11 @@ interface Order {
   quantity: number;
   total_price: number;
   created_at: string;
+  last_communication?: {
+    type: string;
+    template_key: string | null;
+    sent_at: string;
+  } | null;
 }
 
 interface FinanceStats {
@@ -68,8 +74,33 @@ export default function AdminOrders() {
 
       if (error) throw error;
 
+      // Fetch last communication for each order
+      const orderIds = data?.map(o => o.id) || [];
+      const { data: communications } = await supabase
+        .from('order_communications')
+        .select('order_id, type, template_key, sent_at')
+        .in('order_id', orderIds)
+        .order('sent_at', { ascending: false });
+
+      // Group communications by order_id, keeping only the latest
+      const lastCommByOrder: Record<string, { type: string; template_key: string | null; sent_at: string }> = {};
+      communications?.forEach(comm => {
+        if (!lastCommByOrder[comm.order_id]) {
+          lastCommByOrder[comm.order_id] = {
+            type: comm.type,
+            template_key: comm.template_key,
+            sent_at: comm.sent_at,
+          };
+        }
+      });
+
+      // Merge communications with orders
+      let filteredOrders = (data || []).map(order => ({
+        ...order,
+        last_communication: lastCommByOrder[order.id] || null,
+      }));
+
       // Client-side search filtering
-      let filteredOrders = data || [];
       if (searchQuery) {
         const search = searchQuery.toLowerCase();
         filteredOrders = filteredOrders.filter(
@@ -272,6 +303,33 @@ export default function AdminOrders() {
     });
   };
 
+  const formatDateTime = (dateStr: string) => {
+    const date = new Date(dateStr);
+    return {
+      date: date.toLocaleDateString('de-DE', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+      }),
+      time: date.toLocaleTimeString('de-DE', {
+        hour: '2-digit',
+        minute: '2-digit',
+      }),
+    };
+  };
+
+  const getTemplateLabel = (templateKey: string | null): string => {
+    const labels: Record<string, string> = {
+      order_confirmation: 'Bestellbestätigung',
+      appointment_payment: 'Terminbestätigung',
+      payment_received: 'Zahlungseingang',
+      delivery_reminder: 'Liefererinnerung',
+      delivery_today: 'Lieferung heute',
+      payment_reminder: 'Zahlungserinnerung',
+    };
+    return labels[templateKey || ''] || templateKey || 'Nachricht';
+  };
+
   const getStatusBadge = (status: string) => {
     const statusStyles: Record<string, string> = {
       pending: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400',
@@ -414,6 +472,7 @@ export default function AdminOrders() {
                       <th className="p-4 text-left text-sm font-medium">Betrag</th>
                       <th className="p-4 text-left text-sm font-medium">Status</th>
                       <th className="p-4 text-left text-sm font-medium">Datum</th>
+                      <th className="p-4 text-left text-sm font-medium">Letzte Nachricht</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -466,7 +525,38 @@ export default function AdminOrders() {
                             </SelectContent>
                           </Select>
                         </td>
-                        <td className="p-4 text-muted-foreground">{formatDate(order.created_at)}</td>
+                        <td className="p-4">
+                          <div className="text-sm">
+                            <p className="font-medium">{formatDateTime(order.created_at).date}</p>
+                            <p className="text-muted-foreground">{formatDateTime(order.created_at).time} Uhr</p>
+                          </div>
+                        </td>
+                        <td className="p-4">
+                          {order.last_communication ? (
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <div className="flex items-center gap-2 text-sm">
+                                  {order.last_communication.type === 'email' ? (
+                                    <Mail className="h-4 w-4 text-blue-500" />
+                                  ) : (
+                                    <MessageSquare className="h-4 w-4 text-green-500" />
+                                  )}
+                                  <span className="text-muted-foreground truncate max-w-[120px]">
+                                    {getTemplateLabel(order.last_communication.template_key)}
+                                  </span>
+                                </div>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p>{getTemplateLabel(order.last_communication.template_key)}</p>
+                                <p className="text-xs text-muted-foreground">
+                                  {formatDateTime(order.last_communication.sent_at).date} um {formatDateTime(order.last_communication.sent_at).time}
+                                </p>
+                              </TooltipContent>
+                            </Tooltip>
+                          ) : (
+                            <span className="text-xs text-muted-foreground">–</span>
+                          )}
+                        </td>
                       </tr>
                     ))}
                   </tbody>
