@@ -7,7 +7,7 @@ import { useOrder, OilType, AdditiveType } from "@/context/OrderContext";
 import { cn } from "@/lib/utils";
 import { Droplet, Sparkles, Leaf, Ban, Snowflake, Shield, Package } from "lucide-react";
 
-const oilTypes: { value: OilType; icon: typeof Droplet; title: string; description: string; badge?: string }[] = [
+const oilTypes: { value: OilType; icon: typeof Droplet; title: string; description: string }[] = [
   {
     value: "standard",
     icon: Droplet,
@@ -19,14 +19,12 @@ const oilTypes: { value: OilType; icon: typeof Droplet; title: string; descripti
     icon: Sparkles,
     title: "Heizöl EL Premium",
     description: "Schwefelarm, saubere Verbrennung, weniger Wartung",
-    badge: "+0,02€/L",
   },
   {
     value: "bio",
     icon: Leaf,
     title: "Bio-Heizöl",
     description: "Klimaneutral durch CO₂-Kompensation",
-    badge: "+0,04€/L",
   },
 ];
 
@@ -135,11 +133,6 @@ export default function ProductStep() {
                     <div className="w-10 h-10 rounded-lg bg-accent flex items-center justify-center">
                       <type.icon className="w-5 h-5 text-primary" />
                     </div>
-                    {type.badge && (
-                      <span className="text-xs font-medium text-primary bg-accent px-2 py-1 rounded-full">
-                        {type.badge}
-                      </span>
-                    )}
                   </div>
                   <h3 className="font-semibold text-foreground mb-1">{type.title}</h3>
                   <p className="text-sm text-muted-foreground">{type.description}</p>

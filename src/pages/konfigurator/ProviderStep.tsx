@@ -75,7 +75,7 @@ export default function ProviderStep() {
           const isSelected = order.provider?.id === provider.id;
           const isCheapest = index === 0;
           const priceDiff = provider.totalPrice - cheapestPrice;
-          const pricePer100ml = provider.pricePerLiter / 10; // Convert per liter to per 100ml
+          const pricePer100L = provider.pricePerLiter * 100; // Price per 100 liters
 
           return (
             <Card
@@ -158,9 +158,9 @@ export default function ProviderStep() {
                   {/* Bottom row: Price */}
                   <div className="flex items-center justify-between">
                     <div className="text-sm">
-                      <span className="text-muted-foreground">Preis pro 100ml: </span>
+                      <span className="text-muted-foreground">Preis pro 100 Liter: </span>
                       <span className="font-medium text-foreground">
-                        {(pricePer100ml * 100).toFixed(2)} ct
+                        {pricePer100L.toLocaleString("de-DE", { style: "currency", currency: "EUR" })}
                       </span>
                     </div>
                     <div className="text-right">
