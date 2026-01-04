@@ -495,7 +495,6 @@ export default function AdminOrderDetail() {
           <TabsList>
             <TabsTrigger value="overview">Übersicht</TabsTrigger>
             <TabsTrigger value="communication">Kommunikation</TabsTrigger>
-            <TabsTrigger value="phone">Telefon-Validierung</TabsTrigger>
           </TabsList>
 
           <TabsContent value="overview" className="space-y-6 mt-6">
@@ -548,6 +547,14 @@ export default function AdminOrderDetail() {
                     </p>
                   </div>
                   <div>
+                    <Label className="text-muted-foreground">Adresse</Label>
+                    <p className="font-medium">
+                      {order.street} {order.house_number}
+                      <br />
+                      {order.postal_code} {order.city}
+                    </p>
+                  </div>
+                  <div>
                     <Label className="text-muted-foreground">E-Mail</Label>
                     <p className="font-medium">{order.customer_email}</p>
                   </div>
@@ -584,6 +591,38 @@ export default function AdminOrderDetail() {
                         </>
                       )}
                     </div>
+                    {/* Phone validation buttons */}
+                    {order.customer_phone && (
+                      <div className="flex gap-2 mt-2">
+                        <Button size="sm" variant="outline" onClick={handleHlrCheck}>
+                          HLR-Check
+                        </Button>
+                        <Button size="sm" variant="outline" onClick={handleCnamCheck}>
+                          CNAM-Check
+                        </Button>
+                      </div>
+                    )}
+                    {/* HLR Result */}
+                    {order.hlr_status && (
+                      <div className="mt-2 p-2 bg-muted rounded text-sm">
+                        <span className="font-medium">HLR: </span>
+                        <span className={(order.hlr_status as Record<string, unknown>).valid ? 'text-green-600' : 'text-red-600'}>
+                          {(order.hlr_status as Record<string, unknown>).valid ? '✓ Gültig' : '✗ Ungültig'}
+                        </span>
+                        {(order.hlr_status as Record<string, unknown>).carrier && (
+                          <span className="text-muted-foreground ml-2">
+                            ({String((order.hlr_status as Record<string, unknown>).carrier)})
+                          </span>
+                        )}
+                      </div>
+                    )}
+                    {/* CNAM Result */}
+                    {order.cnam_status && (
+                      <div className="mt-1 p-2 bg-muted rounded text-sm">
+                        <span className="font-medium">CNAM: </span>
+                        <span>{String((order.cnam_status as Record<string, unknown>).name || 'Nicht verfügbar')}</span>
+                      </div>
+                    )}
                   </div>
                 </CardContent>
               </Card>
@@ -594,14 +633,6 @@ export default function AdminOrderDetail() {
                   <CardTitle>Lieferdaten</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <div>
-                    <Label className="text-muted-foreground">Adresse</Label>
-                    <p className="font-medium">
-                      {order.street} {order.house_number}
-                      <br />
-                      {order.postal_code} {order.city}
-                    </p>
-                  </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <Label className="text-muted-foreground">Liefertermin</Label>
@@ -718,58 +749,6 @@ export default function AdminOrderDetail() {
             </Card>
           </TabsContent>
 
-          <TabsContent value="phone" className="space-y-6 mt-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Telefon-Validierung</CardTitle>
-                <CardDescription>Überprüfen Sie die Telefonnummer des Kunden</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="flex items-center gap-4">
-                  <Phone className="h-8 w-8 text-muted-foreground" />
-                  <div>
-                    <p className="text-lg font-medium">{order.customer_phone || 'Keine Nummer'}</p>
-                    {order.phone_verified && (
-                      <span className="text-sm text-green-600">✓ Verifiziert</span>
-                    )}
-                  </div>
-                </div>
-
-                <div className="flex gap-4">
-                  <Button onClick={handleHlrCheck} disabled={!order.customer_phone}>
-                    HLR-Check
-                  </Button>
-                  <Button variant="outline" onClick={handleCnamCheck} disabled={!order.customer_phone}>
-                    CNAM-Check
-                  </Button>
-                </div>
-
-                {order.hlr_status && (
-                  <div className="border rounded-lg p-4">
-                    <h4 className="font-medium mb-2">HLR-Ergebnis</h4>
-                    <div className="grid grid-cols-2 gap-2 text-sm">
-                      <span className="text-muted-foreground">Gültig:</span>
-                      <span>{(order.hlr_status as Record<string, unknown>).valid ? '✓ Ja' : '✗ Nein'}</span>
-                      <span className="text-muted-foreground">Erreichbar:</span>
-                      <span>{(order.hlr_status as Record<string, unknown>).reachable ? '✓ Ja' : '✗ Nein'}</span>
-                      <span className="text-muted-foreground">Carrier:</span>
-                      <span>{String((order.hlr_status as Record<string, unknown>).carrier || '-')}</span>
-                    </div>
-                  </div>
-                )}
-
-                {order.cnam_status && (
-                  <div className="border rounded-lg p-4">
-                    <h4 className="font-medium mb-2">CNAM-Ergebnis</h4>
-                    <div className="grid grid-cols-2 gap-2 text-sm">
-                      <span className="text-muted-foreground">Name:</span>
-                      <span>{String((order.cnam_status as Record<string, unknown>).name || 'Nicht verfügbar')}</span>
-                    </div>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </TabsContent>
         </Tabs>
       </div>
 
