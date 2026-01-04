@@ -3,9 +3,10 @@ import { ConfiguratorLayout } from "@/components/configurator/ConfiguratorLayout
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { useOrder, PROVIDERS, calculatePrice } from "@/context/OrderContext";
+import { useOrder, PROVIDERS } from "@/context/OrderContext";
+import { useMarketPrice, calculatePriceWithMarket } from "@/hooks/useMarketPrice";
 import { cn } from "@/lib/utils";
-import { Star, Clock, Award, Check, ArrowRight } from "lucide-react";
+import { Star, Clock, Award, Check, ArrowRight, Loader2 } from "lucide-react";
 
 // Provider logos
 import hoyerLogo from "@/assets/providers/hoyer.png";
@@ -27,18 +28,35 @@ const providerLogos: Record<string, string> = {
 export default function ProviderStep() {
   const navigate = useNavigate();
   const { order, updateOrder, setCurrentStep } = useOrder();
+  const { marketPrice, isLoading } = useMarketPrice();
 
-  // Calculate prices for each provider
+  // Calculate prices for each provider using market price from database
   const providersWithPrices = PROVIDERS.map((provider) => {
-    const { pricePerLiter, totalPrice } = calculatePrice(
+    const { pricePerLiter, totalPrice } = calculatePriceWithMarket(
       order.quantity,
       order.oilType,
-      provider.priceMultiplier
+      provider.priceMultiplier,
+      marketPrice
     );
     return { ...provider, pricePerLiter, totalPrice };
   }).sort((a, b) => a.totalPrice - b.totalPrice);
 
   const cheapestPrice = providersWithPrices[0]?.totalPrice || 0;
+
+  if (isLoading) {
+    return (
+      <ConfiguratorLayout
+        step={2}
+        title="Anbieter vergleichen"
+        subtitle="Preise werden geladen..."
+        canProceed={false}
+      >
+        <div className="flex items-center justify-center py-20">
+          <Loader2 className="w-8 h-8 animate-spin text-primary" />
+        </div>
+      </ConfiguratorLayout>
+    );
+  }
 
   const handleSelectProvider = (provider: typeof providersWithPrices[0]) => {
     updateOrder({
