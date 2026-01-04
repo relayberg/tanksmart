@@ -1,11 +1,21 @@
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { ConfiguratorLayout } from "@/components/configurator/ConfiguratorLayout";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useOrder, HoseLength } from "@/context/OrderContext";
+import { useAddressAutocomplete } from "@/hooks/useAddressAutocomplete";
+import { StreetAutocomplete } from "@/components/ui/street-autocomplete";
 import { cn } from "@/lib/utils";
-import { Truck, AlertCircle, Ruler } from "lucide-react";
+import { AlertCircle, Ruler, Loader2, Check } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const hoseLengths: { value: HoseLength; title: string; description: string }[] = [
   {
@@ -23,6 +33,66 @@ const hoseLengths: { value: HoseLength; title: string; description: string }[] =
 export default function DeliveryStep() {
   const navigate = useNavigate();
   const { order, updateOrder, setCurrentStep, canProceed } = useOrder();
+  const {
+    localities,
+    streets,
+    isLoadingLocalities,
+    isLoadingStreets,
+    localityError,
+    localityValid,
+    fetchLocalitiesByPostalCode,
+    fetchStreets,
+    clearStreets,
+    resetLocalities,
+  } = useAddressAutocomplete();
+
+  const [streetInput, setStreetInput] = useState(order.street);
+  const [cityReadonly, setCityReadonly] = useState(false);
+
+  // Handle PLZ change
+  useEffect(() => {
+    const plz = order.postalCode;
+
+    if (plz.length === 5) {
+      fetchLocalitiesByPostalCode(plz).then(({ localities: locs }) => {
+        if (locs.length === 1) {
+          // Auto-fill city and make readonly
+          updateOrder({ city: locs[0].name });
+          setCityReadonly(true);
+        } else if (locs.length > 1) {
+          // Multiple localities - let user choose
+          setCityReadonly(false);
+          if (!order.city) {
+            updateOrder({ city: locs[0].name });
+          }
+        } else {
+          setCityReadonly(false);
+        }
+      });
+    } else {
+      resetLocalities();
+      setCityReadonly(false);
+    }
+  }, [order.postalCode]);
+
+  // Handle street input change
+  const handleStreetInputChange = (value: string) => {
+    setStreetInput(value);
+    updateOrder({ street: value });
+
+    if (value.length >= 2 && order.postalCode.length === 5) {
+      fetchStreets(value, order.postalCode);
+    } else {
+      clearStreets();
+    }
+  };
+
+  // Handle street selection
+  const handleStreetSelect = (street: { name: string; postalCode: string; locality: string }) => {
+    setStreetInput(street.name);
+    updateOrder({ street: street.name });
+    clearStreets();
+  };
 
   const handleNext = () => {
     setCurrentStep(5);
@@ -44,44 +114,94 @@ export default function DeliveryStep() {
             Lieferadresse
           </label>
           <div className="grid md:grid-cols-2 gap-4">
+            {/* PLZ */}
             <div>
               <label className="block text-sm text-muted-foreground mb-1.5">
                 Postleitzahl
               </label>
-              <Input
-                type="text"
-                value={order.postalCode}
-                onChange={(e) => {
-                  const value = e.target.value.replace(/\D/g, "").slice(0, 5);
-                  updateOrder({ postalCode: value });
-                }}
-                inputSize="lg"
-              />
+              <div className="relative">
+                <Input
+                  type="text"
+                  value={order.postalCode}
+                  onChange={(e) => {
+                    const value = e.target.value.replace(/\D/g, "").slice(0, 5);
+                    updateOrder({ postalCode: value });
+                  }}
+                  inputSize="lg"
+                  className={cn(
+                    localityError && "border-destructive",
+                    localityValid && "border-success"
+                  )}
+                />
+                <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                  {isLoadingLocalities && (
+                    <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+                  )}
+                  {!isLoadingLocalities && localityValid && (
+                    <Check className="h-4 w-4 text-success" />
+                  )}
+                </div>
+              </div>
+              {localityError && (
+                <p className="text-sm text-destructive mt-1">{localityError}</p>
+              )}
             </div>
+
+            {/* City */}
             <div>
               <label className="block text-sm text-muted-foreground mb-1.5">
                 Ort
               </label>
-              <Input
-                type="text"
-                placeholder="z.B. München"
-                value={order.city}
-                onChange={(e) => updateOrder({ city: e.target.value })}
-                inputSize="lg"
-              />
+              {localities.length > 1 && !cityReadonly ? (
+                <Select
+                  value={order.city}
+                  onValueChange={(value) => updateOrder({ city: value })}
+                >
+                  <SelectTrigger className="h-12">
+                    <SelectValue placeholder="Ort wählen" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {localities.map((loc, index) => (
+                      <SelectItem key={`${loc.name}-${index}`} value={loc.name}>
+                        {loc.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              ) : (
+                <Input
+                  type="text"
+                  placeholder="z.B. München"
+                  value={order.city}
+                  onChange={(e) => updateOrder({ city: e.target.value })}
+                  inputSize="lg"
+                  readOnly={cityReadonly}
+                  className={cn(cityReadonly && "bg-muted")}
+                />
+              )}
             </div>
+
+            {/* Street with Autocomplete */}
             <div>
               <label className="block text-sm text-muted-foreground mb-1.5">
                 Straße
               </label>
-              <Input
-                type="text"
-                placeholder="z.B. Musterstraße"
-                value={order.street}
-                onChange={(e) => updateOrder({ street: e.target.value })}
-                inputSize="lg"
+              <StreetAutocomplete
+                value={streetInput}
+                onChange={handleStreetInputChange}
+                onSelect={handleStreetSelect}
+                streets={streets}
+                isLoading={isLoadingStreets}
+                disabled={order.postalCode.length !== 5}
+                placeholder={
+                  order.postalCode.length !== 5
+                    ? "Bitte zuerst PLZ eingeben"
+                    : "Straße eingeben..."
+                }
               />
             </div>
+
+            {/* House Number */}
             <div>
               <label className="block text-sm text-muted-foreground mb-1.5">
                 Hausnummer
