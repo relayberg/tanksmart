@@ -34,17 +34,6 @@ export function Header() {
           </a>
         </nav>
 
-        <div className="flex items-center gap-4">
-          <span className="hidden lg:block text-sm text-muted-foreground">
-            Kostenlose Beratung:
-          </span>
-          <a 
-            href="tel:0800123456789" 
-            className="text-sm font-semibold text-primary hover:text-primary/80 transition-colors"
-          >
-            0800 123 456 789
-          </a>
-        </div>
       </div>
     </header>
   );
