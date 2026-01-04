@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { useSearchParams, Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Header } from "@/components/Header";
@@ -32,6 +33,11 @@ const steps = [
 export default function OrderSuccess() {
   const [searchParams] = useSearchParams();
   const orderNumber = searchParams.get("bestellnummer") || "TS-00000000-0000";
+
+  // Scroll to top on mount
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   return (
     <div className="min-h-screen flex flex-col">
