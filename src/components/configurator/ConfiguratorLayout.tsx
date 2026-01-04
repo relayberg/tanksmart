@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import { ReactNode, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Logo } from "@/components/Logo";
@@ -40,6 +40,11 @@ export function ConfiguratorLayout({
   const navigate = useNavigate();
   const location = useLocation();
   const { setCurrentStep } = useOrder();
+
+  // Scroll to top on step change
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [location.pathname]);
 
   const handleBack = () => {
     const prevStep = steps.find((s) => s.number === step - 1);
