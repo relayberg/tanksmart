@@ -4,8 +4,10 @@ import { Logo } from "./Logo";
 export function Header() {
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-lg border-b border-border/50">
-      <div className="container flex items-center justify-between h-16">
-        <Logo />
+      <div className="container flex items-center justify-center h-16 relative">
+        <div className="absolute left-4 lg:left-0">
+          <Logo />
+        </div>
         
         <nav className="hidden md:flex items-center gap-8">
           <Link 
@@ -33,7 +35,6 @@ export function Header() {
             FAQ
           </a>
         </nav>
-
       </div>
     </header>
   );
