@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { format } from "date-fns";
 import { de } from "date-fns/locale";
@@ -6,11 +7,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useOrder } from "@/context/OrderContext";
 import { toast } from "@/hooks/use-toast";
-import { Droplet, User, MapPin, Calendar, CreditCard, CheckCircle2 } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { Droplet, User, MapPin, Calendar, CreditCard, Loader2 } from "lucide-react";
 
 export default function PaymentStep() {
   const navigate = useNavigate();
-  const { order, updateOrder, canProceed } = useOrder();
+  const { order, updateOrder, canProceed, resetOrder } = useOrder();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const deposit = order.totalPrice / 2;
   const remaining = order.totalPrice / 2;
@@ -34,23 +37,63 @@ export default function PaymentStep() {
     flexible: "Flexibel (Ganztägig)",
   };
 
-  const handleSubmit = () => {
-    // Generate order number
-    const today = new Date();
-    const dateStr = format(today, "yyyyMMdd");
-    const randomNum = Math.floor(1000 + Math.random() * 9000);
-    const orderNumber = `TS-${dateStr}-${randomNum}`;
+  const handleSubmit = async () => {
+    if (isSubmitting) return;
+    
+    setIsSubmitting(true);
 
-    // In production, this would send to the backend
-    toast({
-      title: "Bestellung wird verarbeitet...",
-      description: "Bitte warten Sie einen Moment.",
-    });
+    try {
+      // Call the create-order edge function
+      const { data, error } = await supabase.functions.invoke('create-order', {
+        body: {
+          oilType: order.oilType,
+          quantity: order.quantity,
+          additive: order.additive,
+          pricePerLiter: order.pricePerLiter,
+          totalPrice: order.totalPrice,
+          providerName: order.provider?.name || '',
+          providerId: order.provider?.id || '',
+          deliveryDate: order.deliveryDate ? format(order.deliveryDate, 'yyyy-MM-dd') : null,
+          timeSlot: order.timeSlot,
+          salutation: order.salutation,
+          firstName: order.firstName,
+          lastName: order.lastName,
+          email: order.email,
+          phone: order.phone,
+          street: order.street,
+          houseNumber: order.houseNumber,
+          postalCode: order.postalCode,
+          city: order.city,
+          deliveryNotes: order.deliveryNotes,
+          hoseLength: order.hoseLength,
+          truckAccessible: order.truckAccessible,
+        },
+      });
 
-    // Navigate to success page
-    setTimeout(() => {
-      navigate(`/bestellung-erfolgreich?bestellnummer=${orderNumber}`);
-    }, 1500);
+      if (error) {
+        console.error('Order creation error:', error);
+        throw new Error(error.message || 'Bestellung konnte nicht erstellt werden');
+      }
+
+      if (!data?.success) {
+        throw new Error(data?.error || 'Unbekannter Fehler');
+      }
+
+      // Reset order state
+      resetOrder();
+
+      // Navigate to success page
+      navigate(`/bestellung-erfolgreich?bestellnummer=${data.orderNumber}`);
+    } catch (error) {
+      console.error('Submit error:', error);
+      toast({
+        title: "Fehler bei der Bestellung",
+        description: error instanceof Error ? error.message : "Bitte versuchen Sie es erneut.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -59,8 +102,8 @@ export default function PaymentStep() {
       title="Bestellung abschließen"
       subtitle="Überprüfen Sie Ihre Bestellung und schließen Sie den Kauf ab"
       onNext={handleSubmit}
-      nextLabel="Jetzt kostenpflichtig bestellen"
-      canProceed={canProceed(6)}
+      nextLabel={isSubmitting ? "Wird verarbeitet..." : "Jetzt kostenpflichtig bestellen"}
+      canProceed={canProceed(6) && !isSubmitting}
     >
       <div className="space-y-6">
         {/* Order Summary */}
