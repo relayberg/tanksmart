@@ -26,8 +26,11 @@ import AdminOrders from "./pages/admin/AdminOrders";
 import AdminOrderDetail from "./pages/admin/AdminOrderDetail";
 import AdminEmailSettings from "./pages/admin/settings/AdminEmailSettings";
 import AdminEmailTemplates from "./pages/admin/settings/AdminEmailTemplates";
+import AdminSmsTemplates from "./pages/admin/settings/AdminSmsTemplates";
+import AdminApiSettings from "./pages/admin/settings/AdminApiSettings";
 import AdminPriceSettings from "./pages/admin/settings/AdminPriceSettings";
 import AdminBankSettings from "./pages/admin/settings/AdminBankSettings";
+import AdminLegalSettings from "./pages/admin/settings/AdminLegalSettings";
 
 const queryClient = new QueryClient();
 
@@ -64,8 +67,11 @@ const App = () => (
               <Route path="/admin/orders/:id" element={<AdminOrderDetail />} />
               <Route path="/admin/settings/email" element={<AdminEmailSettings />} />
               <Route path="/admin/settings/templates" element={<AdminEmailTemplates />} />
+              <Route path="/admin/settings/sms-templates" element={<AdminSmsTemplates />} />
+              <Route path="/admin/settings/api" element={<AdminApiSettings />} />
               <Route path="/admin/settings/prices" element={<AdminPriceSettings />} />
               <Route path="/admin/settings/bank" element={<AdminBankSettings />} />
+              <Route path="/admin/settings/legal" element={<AdminLegalSettings />} />
               
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
