@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Phone } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 
 export function CTASection() {
@@ -24,20 +24,12 @@ export function CTASection() {
             bei Ihrer nächsten Heizölbestellung.
           </p>
 
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Button asChild variant="hero" size="xl">
-              <Link to="/konfigurator/produkt">
-                Jetzt vergleichen
-                <ArrowRight className="w-5 h-5" />
-              </Link>
-            </Button>
-            <Button asChild variant="hero-outline" size="xl">
-              <a href="tel:0800123456789">
-                <Phone className="w-5 h-5" />
-                0800 123 456 789
-              </a>
-            </Button>
-          </div>
+          <Button asChild variant="hero" size="xl">
+            <Link to="/konfigurator/produkt">
+              Jetzt vergleichen
+              <ArrowRight className="w-5 h-5" />
+            </Link>
+          </Button>
 
           <p className="text-sm text-primary-foreground/50 mt-6">
             Kostenlos • Unverbindlich • Keine Anmeldung nötig
