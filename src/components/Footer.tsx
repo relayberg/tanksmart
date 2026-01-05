@@ -11,7 +11,7 @@ export function Footer() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 md:gap-12">
           {/* Brand */}
           <div className="space-y-4 sm:col-span-2 lg:col-span-1">
-            <Logo className="brightness-0 invert" />
+            <Logo />
             <p className="text-sm text-secondary-foreground/70 leading-relaxed">
               Deutschlands führendes Heizöl-Preisvergleichsportal. Sparen Sie bis zu 30% 
               bei Ihrer nächsten Heizölbestellung.
