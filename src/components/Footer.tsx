@@ -1,40 +1,11 @@
 import { Link } from "react-router-dom";
 import { Logo } from "./Logo";
 import { Mail } from "lucide-react";
-import { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { useAppSettings } from "@/context/AppSettingsContext";
 
 export function Footer() {
   const currentYear = new Date().getFullYear();
-  const [companyName, setCompanyName] = useState<string>("Die Heizer GmbH");
-  const [companyEmail, setCompanyEmail] = useState<string>("info@tanksmart24.de");
-
-  useEffect(() => {
-    const fetchCompanyData = async () => {
-      try {
-        const { data, error } = await supabase
-          .from("app_settings")
-          .select("key, value")
-          .in("key", ["company_name", "company_email"]);
-
-        if (error) {
-          console.error("Error fetching company data:", error);
-          return;
-        }
-
-        if (data) {
-          data.forEach((item) => {
-            if (item.key === "company_name") setCompanyName(item.value);
-            if (item.key === "company_email") setCompanyEmail(item.value);
-          });
-        }
-      } catch (err) {
-        console.error("Error fetching company data:", err);
-      }
-    };
-
-    fetchCompanyData();
-  }, []);
+  const { settings } = useAppSettings();
 
   return (
     <footer className="bg-secondary text-secondary-foreground">
@@ -101,12 +72,12 @@ export function Footer() {
           {/* Contact */}
           <div>
             <div className="font-semibold mb-4">Kontakt</div>
-            {companyEmail && (
+            {settings.companyEmail && (
               <ul className="space-y-3">
                 <li className="flex items-center gap-3 text-sm text-secondary-foreground/80">
                   <Mail className="w-4 h-4 text-primary shrink-0" />
-                  <a href={`mailto:${companyEmail}`} className="hover:text-secondary-foreground transition-colors">
-                    {companyEmail}
+                  <a href={`mailto:${settings.companyEmail}`} className="hover:text-secondary-foreground transition-colors">
+                    {settings.companyEmail}
                   </a>
                 </li>
               </ul>
@@ -116,7 +87,7 @@ export function Footer() {
 
         <div className="border-t border-secondary-foreground/10 mt-8 md:mt-12 pt-6 md:pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="text-sm text-secondary-foreground/70 text-center md:text-left">
-            © {currentYear} {companyName}. Alle Rechte vorbehalten.
+            © {currentYear} {settings.companyName}. Alle Rechte vorbehalten.
           </p>
           <div className="flex items-center gap-4 md:gap-6 flex-wrap justify-center">
             <span className="text-xs text-secondary-foreground/60">SSL-verschlüsselt</span>
