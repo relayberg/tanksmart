@@ -22,7 +22,7 @@ export function useGoogleAdsConversion({ orderNumber, totalPrice }: ConversionDa
           .from("api_integrations")
           .select("config, is_active")
           .eq("provider", "google_ads")
-          .single();
+          .maybeSingle();
 
         if (!integration?.is_active) {
           return;

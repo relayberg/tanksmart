@@ -6,8 +6,8 @@ import { supabase } from "@/integrations/supabase/client";
 
 export function Footer() {
   const currentYear = new Date().getFullYear();
-  const [companyName, setCompanyName] = useState<string>("");
-  const [companyEmail, setCompanyEmail] = useState<string>("");
+  const [companyName, setCompanyName] = useState<string>("Die Heizer GmbH");
+  const [companyEmail, setCompanyEmail] = useState<string>("info@tanksmart24.de");
 
   useEffect(() => {
     const fetchCompanyData = async () => {
