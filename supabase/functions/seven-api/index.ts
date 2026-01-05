@@ -211,6 +211,15 @@ serve(async (req) => {
           );
         }
 
+        // Get company settings for placeholders
+        const { data: appSettings } = await supabase
+          .from('app_settings')
+          .select('key, value')
+          .in('key', ['company_phone', 'company_name', 'company_email']);
+
+        const settingsData: Record<string, string> = {};
+        appSettings?.forEach(s => { settingsData[s.key] = s.value; });
+
         // Calculate deposit amount
         const totalPrice = Number(order.total_price);
         const depositAmount = Math.round(totalPrice * 0.5 * 100) / 100;
@@ -224,6 +233,9 @@ serve(async (req) => {
           total_price: formatPrice(totalPrice),
           deposit_amount: formatPrice(depositAmount),
           quantity: String(order.quantity),
+          company_phone: settingsData.company_phone || '',
+          company_name: settingsData.company_name || 'Die Heizer GmbH',
+          company_email: settingsData.company_email || '',
         };
 
         const smsText = replacePlaceholders(template.content, placeholderData);
