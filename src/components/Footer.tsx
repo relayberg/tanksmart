@@ -6,32 +6,34 @@ import { supabase } from "@/integrations/supabase/client";
 
 export function Footer() {
   const currentYear = new Date().getFullYear();
-  const [companyName, setCompanyName] = useState<string>("S-Tank GmbH");
+  const [companyName, setCompanyName] = useState<string>("");
+  const [companyEmail, setCompanyEmail] = useState<string>("");
 
   useEffect(() => {
-    const fetchCompanyName = async () => {
+    const fetchCompanyData = async () => {
       try {
         const { data, error } = await supabase
           .from("app_settings")
-          .select("value")
-          .eq("key", "company_name")
-          .limit(1)
-          .maybeSingle();
+          .select("key, value")
+          .in("key", ["company_name", "company_email"]);
 
         if (error) {
-          console.error("Error fetching company name:", error);
+          console.error("Error fetching company data:", error);
           return;
         }
 
-        if (data?.value) {
-          setCompanyName(data.value);
+        if (data) {
+          data.forEach((item) => {
+            if (item.key === "company_name") setCompanyName(item.value);
+            if (item.key === "company_email") setCompanyEmail(item.value);
+          });
         }
       } catch (err) {
-        console.error("Error fetching company name:", err);
+        console.error("Error fetching company data:", err);
       }
     };
 
-    fetchCompanyName();
+    fetchCompanyData();
   }, []);
 
   return (
@@ -99,12 +101,16 @@ export function Footer() {
           {/* Contact */}
           <div>
             <div className="font-semibold mb-4">Kontakt</div>
-            <ul className="space-y-3">
-              <li className="flex items-center gap-3 text-sm text-secondary-foreground/80">
-                <Mail className="w-4 h-4 text-primary shrink-0" />
-                info@tanksmart24.de
-              </li>
-            </ul>
+            {companyEmail && (
+              <ul className="space-y-3">
+                <li className="flex items-center gap-3 text-sm text-secondary-foreground/80">
+                  <Mail className="w-4 h-4 text-primary shrink-0" />
+                  <a href={`mailto:${companyEmail}`} className="hover:text-secondary-foreground transition-colors">
+                    {companyEmail}
+                  </a>
+                </li>
+              </ul>
+            )}
           </div>
         </div>
 
