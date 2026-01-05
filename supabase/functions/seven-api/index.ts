@@ -291,30 +291,71 @@ serve(async (req) => {
           );
         }
 
+        console.log(`Checking SMS status for messageId: ${messageId}`);
+
         const response = await fetch(`${SEVEN_API_BASE}/status?msg_id=${messageId}`, {
           headers: { 'X-Api-Key': config.api_key },
         });
 
         const result = await response.text();
+        const trimmedResult = result.trim().toUpperCase();
+        
+        console.log(`Seven API status response: "${result}" -> trimmed: "${trimmedResult}"`);
+
+        // Map Seven.io status to our status
+        const statusMap: Record<string, string> = {
+          'DELIVERED': 'delivered',
+          'NOTDELIVERED': 'notdelivered',
+          'TRANSMITTED': 'transmitted',
+          'ACCEPTED': 'transmitted',
+          'BUFFERED': 'transmitted',
+          'EXPIRED': 'notdelivered',
+          'FAILED': 'notdelivered',
+          'REJECTED': 'notdelivered',
+          'UNKNOWN': 'sent',
+        };
+
+        const mappedStatus = statusMap[trimmedResult] || 'sent';
+        console.log(`Mapped status: ${mappedStatus}`);
 
         // Update communication status if found
         if (orderId) {
-          const statusMap: Record<string, string> = {
-            'DELIVERED': 'delivered',
-            'NOTDELIVERED': 'notdelivered',
-            'TRANSMITTED': 'transmitted',
-          };
-
-          await supabase
+          // Find the communication by order_id and messageId in metadata
+          const { data: comms, error: findError } = await supabase
             .from('order_communications')
-            .update({ status: statusMap[result] || 'sent' })
+            .select('id, metadata')
             .eq('order_id', orderId)
-            .eq('type', 'sms')
-            .contains('metadata', { seven_message_id: messageId });
+            .eq('type', 'sms');
+
+          if (findError) {
+            console.error('Error finding communications:', findError);
+          } else {
+            // Find the one with matching seven_message_id
+            const matchingComm = comms?.find((c) => {
+              const meta = c.metadata as { seven_message_id?: string } | null;
+              return meta?.seven_message_id === messageId;
+            });
+
+            if (matchingComm) {
+              console.log(`Updating communication ${matchingComm.id} to status: ${mappedStatus}`);
+              const { error: updateError } = await supabase
+                .from('order_communications')
+                .update({ status: mappedStatus })
+                .eq('id', matchingComm.id);
+
+              if (updateError) {
+                console.error('Error updating communication status:', updateError);
+              } else {
+                console.log('Communication status updated successfully');
+              }
+            } else {
+              console.log('No matching communication found for messageId:', messageId);
+            }
+          }
         }
 
         return new Response(
-          JSON.stringify({ status: result }),
+          JSON.stringify({ status: trimmedResult, mappedStatus }),
           { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
       }
