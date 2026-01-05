@@ -122,14 +122,14 @@ serve(async (req) => {
       );
     }
 
-    // Get bank settings
-    const { data: bankSettings } = await supabase
+    // Get bank and company settings
+    const { data: appSettings } = await supabase
       .from('app_settings')
       .select('key, value')
-      .in('key', ['bank_recipient', 'bank_iban', 'bank_bic']);
+      .in('key', ['bank_recipient', 'bank_iban', 'bank_bic', 'company_name', 'company_email', 'company_phone', 'company_address', 'company_city', 'company_ceo', 'company_register', 'company_tax_id']);
 
-    const bankData: Record<string, string> = {};
-    bankSettings?.forEach(s => { bankData[s.key] = s.value; });
+    const settingsData: Record<string, string> = {};
+    appSettings?.forEach(s => { settingsData[s.key] = s.value; });
 
     // Calculate payment amounts
     const totalPrice = Number(order.total_price);
@@ -169,9 +169,17 @@ serve(async (req) => {
       delivery_date: formatDate(deliveryDateOverride || order.delivery_date),
       time_slot: formatTimeSlot(order.time_slot),
       provider_name: order.provider_name,
-      bank_recipient: bankData.bank_recipient || '',
-      bank_iban: bankData.bank_iban || '',
-      bank_bic: bankData.bank_bic || '',
+      bank_recipient: settingsData.bank_recipient || '',
+      bank_iban: settingsData.bank_iban || '',
+      bank_bic: settingsData.bank_bic || '',
+      company_name: settingsData.company_name || 'Die Heizer GmbH',
+      company_email: settingsData.company_email || 'info@tanksmart24.de',
+      company_phone: settingsData.company_phone || '',
+      company_address: settingsData.company_address || '',
+      company_city: settingsData.company_city || '',
+      company_ceo: settingsData.company_ceo || '',
+      company_register: settingsData.company_register || '',
+      company_tax_id: settingsData.company_tax_id || '',
     };
 
     // Replace placeholders in template
