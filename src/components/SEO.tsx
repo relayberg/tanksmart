@@ -1,4 +1,5 @@
 import { Helmet } from "react-helmet-async";
+import { useAppSettings } from "@/context/AppSettingsContext";
 
 interface SEOProps {
   title: string;
@@ -12,43 +13,6 @@ interface SEOProps {
 const BASE_URL = "https://tanksmart24.de";
 const DEFAULT_IMAGE = `${BASE_URL}/og-image.png`;
 
-// Organization JSON-LD - consistent on all pages (no cloaking risk)
-const organizationJsonLd = {
-  "@context": "https://schema.org",
-  "@type": "Organization",
-  "@id": `${BASE_URL}/#organization`,
-  name: "S-Tank GmbH",
-  alternateName: "TankSmart24",
-  url: BASE_URL,
-  logo: `${BASE_URL}/logo.png`,
-  contactPoint: {
-    "@type": "ContactPoint",
-    telephone: "+49-800-123456789",
-    contactType: "customer service",
-    availableLanguage: "German",
-  },
-  address: {
-    "@type": "PostalAddress",
-    streetAddress: "Musterstraße 123",
-    addressLocality: "Musterstadt",
-    postalCode: "12345",
-    addressCountry: "DE",
-  },
-};
-
-// WebSite JSON-LD
-const websiteJsonLd = {
-  "@context": "https://schema.org",
-  "@type": "WebSite",
-  "@id": `${BASE_URL}/#website`,
-  url: BASE_URL,
-  name: "TankSmart24.de",
-  description: "Heizöl Preisvergleich - Vergleichen Sie Anbieter und sparen Sie bei Ihrer Heizölbestellung.",
-  publisher: {
-    "@id": `${BASE_URL}/#organization`,
-  },
-};
-
 export const SEO = ({
   title,
   description,
@@ -57,10 +21,53 @@ export const SEO = ({
   type = "website",
   image = DEFAULT_IMAGE,
 }: SEOProps) => {
+  const { settings } = useAppSettings();
+  
   const fullTitle = title.includes("TankSmart24")
     ? title
     : `${title} | TankSmart24.de`;
   const canonicalUrl = canonical || BASE_URL;
+
+  // Organization JSON-LD - dynamically generated from app_settings
+  const organizationJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: settings.companyName || "Die Heizer GmbH",
+    alternateName: "TankSmart24",
+    url: settings.companyWebsite || BASE_URL,
+    logo: `${BASE_URL}/logo.png`,
+    ...(settings.companyPhone && {
+      contactPoint: {
+        "@type": "ContactPoint",
+        telephone: settings.companyPhone,
+        contactType: "customer service",
+        availableLanguage: "German",
+      },
+    }),
+    ...(settings.companyAddress && {
+      address: {
+        "@type": "PostalAddress",
+        streetAddress: settings.companyAddress,
+        addressLocality: settings.companyCity,
+        postalCode: settings.companyPostalCode,
+        addressCountry: "DE",
+      },
+    }),
+    ...(settings.companyEmail && { email: settings.companyEmail }),
+  };
+
+  // WebSite JSON-LD
+  const websiteJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    url: BASE_URL,
+    name: "TankSmart24.de",
+    description: "Heizöl Preisvergleich - Vergleichen Sie Anbieter und sparen Sie bei Ihrer Heizölbestellung.",
+    publisher: {
+      "@type": "Organization",
+      name: settings.companyName || "Die Heizer GmbH",
+    },
+  };
 
   return (
     <Helmet>

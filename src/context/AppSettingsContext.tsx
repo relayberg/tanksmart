@@ -5,6 +5,14 @@ interface AppSettings {
   companyName: string;
   companyEmail: string;
   companyPhone: string;
+  companyAddress: string;
+  companyPostalCode: string;
+  companyCity: string;
+  companyCeo: string;
+  companyRegistry: string;
+  companyRegistryNumber: string;
+  companyVatId: string;
+  companyWebsite: string;
   [key: string]: string;
 }
 
@@ -24,6 +32,14 @@ const defaultSettings: AppSettings = {
   companyName: "Die Heizer GmbH",
   companyEmail: "info@tanksmart24.de",
   companyPhone: "",
+  companyAddress: "",
+  companyPostalCode: "",
+  companyCity: "",
+  companyCeo: "",
+  companyRegistry: "",
+  companyRegistryNumber: "",
+  companyVatId: "",
+  companyWebsite: "https://tanksmart24.de",
 };
 
 const defaultGoogleAds: GoogleAdsConfig = {
@@ -61,6 +77,14 @@ export function AppSettingsProvider({ children }: { children: ReactNode }) {
             if (item.key === "company_name") settingsMap.companyName = item.value;
             if (item.key === "company_email") settingsMap.companyEmail = item.value;
             if (item.key === "company_phone") settingsMap.companyPhone = item.value;
+            if (item.key === "company_address") settingsMap.companyAddress = item.value;
+            if (item.key === "company_postal_code") settingsMap.companyPostalCode = item.value;
+            if (item.key === "company_city") settingsMap.companyCity = item.value;
+            if (item.key === "company_ceo") settingsMap.companyCeo = item.value;
+            if (item.key === "company_registry") settingsMap.companyRegistry = item.value;
+            if (item.key === "company_registry_number") settingsMap.companyRegistryNumber = item.value;
+            if (item.key === "company_vat_id") settingsMap.companyVatId = item.value;
+            if (item.key === "company_website") settingsMap.companyWebsite = item.value;
             // Store all other settings with their original key
             settingsMap[item.key] = item.value;
           });
