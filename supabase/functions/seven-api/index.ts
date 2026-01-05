@@ -256,6 +256,23 @@ serve(async (req) => {
         });
 
         const result = await response.json();
+        console.log('Seven SMS response:', JSON.stringify(result));
+
+        // Extract message ID - Seven.io returns different formats
+        // Format 1: { success: "100", messages: [{ id: "123" }] }
+        // Format 2: { success: "100", messages: ["123"] }
+        // Format 3: Just "100" or the message ID directly
+        let messageId: string | null = null;
+        
+        if (result.messages && Array.isArray(result.messages)) {
+          if (typeof result.messages[0] === 'object' && result.messages[0]?.id) {
+            messageId = String(result.messages[0].id);
+          } else if (typeof result.messages[0] === 'string' || typeof result.messages[0] === 'number') {
+            messageId = String(result.messages[0]);
+          }
+        }
+        
+        console.log('Extracted messageId:', messageId);
 
         // Log communication
         await supabase
@@ -268,7 +285,7 @@ serve(async (req) => {
             content: smsText,
             status: result.success === '100' ? 'transmitted' : 'notdelivered',
             metadata: {
-              seven_message_id: result.messages?.[0]?.id,
+              seven_message_id: messageId,
               raw_response: result,
             },
           });
@@ -276,7 +293,7 @@ serve(async (req) => {
         return new Response(
           JSON.stringify({
             success: result.success === '100',
-            messageId: result.messages?.[0]?.id,
+            messageId: messageId,
             result,
           }),
           { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
