@@ -247,6 +247,7 @@ serve(async (req) => {
           headers: {
             'X-Api-Key': config.api_key,
             'Content-Type': 'application/json',
+            'Accept': 'application/json',
           },
           body: JSON.stringify({
             to: normalizedPhone,
@@ -255,24 +256,44 @@ serve(async (req) => {
           }),
         });
 
-        const result = await response.json();
-        console.log('Seven SMS response:', JSON.stringify(result));
+        const rawText = await response.text();
+        console.log('Seven SMS raw response:', rawText);
 
-        // Extract message ID - Seven.io returns different formats
-        // Format 1: { success: "100", messages: [{ id: "123" }] }
-        // Format 2: { success: "100", messages: ["123"] }
-        // Format 3: Just "100" or the message ID directly
-        let messageId: string | null = null;
-        
-        if (result.messages && Array.isArray(result.messages)) {
-          if (typeof result.messages[0] === 'object' && result.messages[0]?.id) {
-            messageId = String(result.messages[0].id);
-          } else if (typeof result.messages[0] === 'string' || typeof result.messages[0] === 'number') {
-            messageId = String(result.messages[0]);
+        let parsed: any = null;
+        try {
+          parsed = JSON.parse(rawText);
+        } catch {
+          // Response can be plain text (e.g. "100\n<ID>")
+        }
+
+        const successCode = (() => {
+          if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+            const code = (parsed.success ?? parsed.code ?? parsed.status);
+            return code != null ? String(code) : '';
+          }
+          return (rawText.trim().split(/\s+/)[0] || '').trim();
+        })();
+
+        // Extract message ID
+        let extractedMessageId: string | null = null;
+        if (parsed && typeof parsed === 'object' && !Array.isArray(parsed) && Array.isArray(parsed.messages)) {
+          const first = parsed.messages[0];
+          if (first && typeof first === 'object' && (first as any).id != null) {
+            extractedMessageId = String((first as any).id);
+          } else if (typeof first === 'string' || typeof first === 'number') {
+            extractedMessageId = String(first);
+          }
+        } else {
+          const parts = rawText.trim().split(/\s+/);
+          if (successCode === '100' && parts.length >= 2) {
+            extractedMessageId = String(parts[1]);
           }
         }
-        
-        console.log('Extracted messageId:', messageId);
+
+        console.log('Seven SMS parsed:', parsed);
+        console.log('Seven SMS extracted:', { successCode, extractedMessageId });
+
+        const success = successCode === '100';
 
         // Log communication
         await supabase
@@ -283,18 +304,21 @@ serve(async (req) => {
             template_key: templateKey,
             recipient: normalizedPhone,
             content: smsText,
-            status: result.success === '100' ? 'transmitted' : 'notdelivered',
+            status: success ? 'transmitted' : 'notdelivered',
             metadata: {
-              seven_message_id: messageId,
-              raw_response: result,
+              seven_message_id: extractedMessageId,
+              raw_response: parsed ?? rawText,
+              raw_text: rawText,
+              success_code: successCode,
             },
           });
 
         return new Response(
           JSON.stringify({
-            success: result.success === '100',
-            messageId: messageId,
-            result,
+            success,
+            messageId: extractedMessageId,
+            successCode,
+            result: parsed ?? rawText,
           }),
           { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
@@ -310,14 +334,30 @@ serve(async (req) => {
 
         console.log(`Checking SMS status for messageId: ${messageId}`);
 
-        const response = await fetch(`${SEVEN_API_BASE}/status?msg_id=${messageId}`, {
-          headers: { 'X-Api-Key': config.api_key },
+        const response = await fetch(`${SEVEN_API_BASE}/status?msg_id=${encodeURIComponent(messageId)}`, {
+          headers: {
+            'X-Api-Key': config.api_key,
+            'Accept': 'application/json',
+          },
         });
 
-        const result = await response.text();
-        const trimmedResult = result.trim().toUpperCase();
-        
-        console.log(`Seven API status response: "${result}" -> trimmed: "${trimmedResult}"`);
+        const rawText = await response.text();
+        console.log(`Seven API status raw response: ${rawText}`);
+
+        let statusRaw = '';
+        try {
+          const parsed = JSON.parse(rawText);
+          if (Array.isArray(parsed)) {
+            statusRaw = String(parsed[0]?.status || '').toUpperCase();
+          } else if (parsed && typeof parsed === 'object') {
+            statusRaw = String((parsed as any).status || '').toUpperCase();
+          }
+        } catch {
+          statusRaw = rawText.trim().toUpperCase();
+        }
+
+        const trimmedResult = statusRaw || rawText.trim().toUpperCase();
+        console.log(`Seven API status normalized: "${trimmedResult}"`);
 
         // Map Seven.io status to our status
         const statusMap: Record<string, string> = {
