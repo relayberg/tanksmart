@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { Logo } from "./Logo";
-import { Mail, Phone, MapPin } from "lucide-react";
+import { Mail } from "lucide-react";
 
 export function Footer() {
   const currentYear = new Date().getFullYear();
@@ -72,20 +72,8 @@ export function Footer() {
             <h4 className="font-semibold mb-4">Kontakt</h4>
             <ul className="space-y-3">
               <li className="flex items-center gap-3 text-sm text-secondary-foreground/70">
-                <Phone className="w-4 h-4 text-primary shrink-0" />
-                0800 123 456 789
-              </li>
-              <li className="flex items-center gap-3 text-sm text-secondary-foreground/70">
                 <Mail className="w-4 h-4 text-primary shrink-0" />
                 info@tanksmart24.de
-              </li>
-              <li className="flex items-start gap-3 text-sm text-secondary-foreground/70">
-                <MapPin className="w-4 h-4 text-primary mt-0.5 shrink-0" />
-                <span>
-                  S-Tank GmbH<br />
-                  Musterstraße 123<br />
-                  12345 Musterstadt
-                </span>
               </li>
             </ul>
           </div>
