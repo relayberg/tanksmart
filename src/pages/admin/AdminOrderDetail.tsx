@@ -413,13 +413,32 @@ export default function AdminOrderDetail() {
     }
   };
 
-  const getSmsStatusBadge = (status: string) => {
+  const getSmsStatusBadge = (status: string, comm: Communication) => {
+    const isRefreshing = refreshingSmsId === comm.id;
+    
+    const handleClick = (e: React.MouseEvent) => {
+      e.stopPropagation();
+      handleRefreshSmsStatus(comm);
+    };
+
+    const RefreshIcon = () => (
+      <button
+        onClick={handleClick}
+        disabled={isRefreshing}
+        className="ml-1 p-0.5 rounded hover:bg-black/10 transition-colors disabled:opacity-50"
+        title="Status aktualisieren"
+      >
+        <RefreshCw className={`h-3 w-3 ${isRefreshing ? 'animate-spin' : ''}`} />
+      </button>
+    );
+
     switch (status) {
       case 'delivered':
         return (
           <span className="inline-flex items-center gap-1 text-xs px-2 py-1 rounded-full bg-green-100 text-green-700">
             <CheckCircle className="h-3 w-3" />
             Zugestellt
+            <RefreshIcon />
           </span>
         );
       case 'transmitted':
@@ -427,6 +446,7 @@ export default function AdminOrderDetail() {
           <span className="inline-flex items-center gap-1 text-xs px-2 py-1 rounded-full bg-blue-100 text-blue-700">
             <Clock className="h-3 w-3" />
             Übertragen
+            <RefreshIcon />
           </span>
         );
       case 'notdelivered':
@@ -434,6 +454,7 @@ export default function AdminOrderDetail() {
           <span className="inline-flex items-center gap-1 text-xs px-2 py-1 rounded-full bg-red-100 text-red-700">
             <AlertCircle className="h-3 w-3" />
             Nicht zugestellt
+            <RefreshIcon />
           </span>
         );
       default:
@@ -441,6 +462,7 @@ export default function AdminOrderDetail() {
           <span className="inline-flex items-center gap-1 text-xs px-2 py-1 rounded-full bg-gray-100 text-gray-700">
             <Clock className="h-3 w-3" />
             {status || 'Gesendet'}
+            <RefreshIcon />
           </span>
         );
     }
@@ -808,24 +830,11 @@ export default function AdminOrderDetail() {
                             <span className="text-sm text-muted-foreground">
                               an {comm.recipient}
                             </span>
-                            {comm.type === 'sms' && getSmsStatusBadge(comm.status)}
+                            {comm.type === 'sms' && getSmsStatusBadge(comm.status, comm)}
                           </div>
-                          <div className="flex items-center gap-2">
-                            <span className="text-sm text-muted-foreground">
-                              {formatDateTime(comm.sent_at)}
-                            </span>
-                            {comm.type === 'sms' && (comm.metadata as { seven_message_id?: string } | null)?.seven_message_id && (
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                className="h-6 w-6"
-                                onClick={() => handleRefreshSmsStatus(comm)}
-                                disabled={refreshingSmsId === comm.id}
-                              >
-                                <RefreshCw className={`h-3 w-3 ${refreshingSmsId === comm.id ? 'animate-spin' : ''}`} />
-                              </Button>
-                            )}
-                          </div>
+                          <span className="text-sm text-muted-foreground">
+                            {formatDateTime(comm.sent_at)}
+                          </span>
                         </div>
                         {comm.subject && (
                           <p className="text-sm font-medium mb-1">Betreff: {comm.subject}</p>
