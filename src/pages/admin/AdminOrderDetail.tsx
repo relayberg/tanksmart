@@ -35,6 +35,10 @@ import {
   X,
   CalendarIcon,
   Send,
+  RefreshCw,
+  CheckCircle,
+  Clock,
+  AlertCircle,
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
@@ -124,6 +128,7 @@ export default function AdminOrderDetail() {
   // SMS dialog
   const [smsDialogOpen, setSmsDialogOpen] = useState(false);
   const [selectedSmsTemplate, setSelectedSmsTemplate] = useState('');
+  const [refreshingSmsId, setRefreshingSmsId] = useState<string | null>(null);
 
   useEffect(() => {
     if (id) {
@@ -365,6 +370,79 @@ export default function AdminOrderDetail() {
         description: 'CNAM-Check fehlgeschlagen',
         variant: 'destructive',
       });
+    }
+  };
+
+  const handleRefreshSmsStatus = async (comm: Communication) => {
+    const metadata = comm.metadata as { seven_message_id?: string } | null;
+    const messageId = metadata?.seven_message_id;
+    
+    if (!messageId) {
+      toast({
+        title: 'Fehler',
+        description: 'Keine Message-ID vorhanden',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    setRefreshingSmsId(comm.id);
+
+    try {
+      const { data, error } = await supabase.functions.invoke('seven-api', {
+        body: {
+          action: 'sms_status',
+          orderId: order?.id,
+          messageId: messageId,
+        },
+      });
+
+      if (error) throw error;
+
+      toast({ title: 'SMS-Status aktualisiert', description: `Status: ${data.status}` });
+      fetchCommunications();
+    } catch (error) {
+      console.error('Error refreshing SMS status:', error);
+      toast({
+        title: 'Fehler',
+        description: 'Status konnte nicht aktualisiert werden',
+        variant: 'destructive',
+      });
+    } finally {
+      setRefreshingSmsId(null);
+    }
+  };
+
+  const getSmsStatusBadge = (status: string) => {
+    switch (status) {
+      case 'delivered':
+        return (
+          <span className="inline-flex items-center gap-1 text-xs px-2 py-1 rounded-full bg-green-100 text-green-700">
+            <CheckCircle className="h-3 w-3" />
+            Zugestellt
+          </span>
+        );
+      case 'transmitted':
+        return (
+          <span className="inline-flex items-center gap-1 text-xs px-2 py-1 rounded-full bg-blue-100 text-blue-700">
+            <Clock className="h-3 w-3" />
+            Übertragen
+          </span>
+        );
+      case 'notdelivered':
+        return (
+          <span className="inline-flex items-center gap-1 text-xs px-2 py-1 rounded-full bg-red-100 text-red-700">
+            <AlertCircle className="h-3 w-3" />
+            Nicht zugestellt
+          </span>
+        );
+      default:
+        return (
+          <span className="inline-flex items-center gap-1 text-xs px-2 py-1 rounded-full bg-gray-100 text-gray-700">
+            <Clock className="h-3 w-3" />
+            {status || 'Gesendet'}
+          </span>
+        );
     }
   };
 
@@ -730,10 +808,24 @@ export default function AdminOrderDetail() {
                             <span className="text-sm text-muted-foreground">
                               an {comm.recipient}
                             </span>
+                            {comm.type === 'sms' && getSmsStatusBadge(comm.status)}
                           </div>
-                          <span className="text-sm text-muted-foreground">
-                            {formatDateTime(comm.sent_at)}
-                          </span>
+                          <div className="flex items-center gap-2">
+                            <span className="text-sm text-muted-foreground">
+                              {formatDateTime(comm.sent_at)}
+                            </span>
+                            {comm.type === 'sms' && (comm.metadata as { seven_message_id?: string } | null)?.seven_message_id && (
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-6 w-6"
+                                onClick={() => handleRefreshSmsStatus(comm)}
+                                disabled={refreshingSmsId === comm.id}
+                              >
+                                <RefreshCw className={`h-3 w-3 ${refreshingSmsId === comm.id ? 'animate-spin' : ''}`} />
+                              </Button>
+                            )}
+                          </div>
                         </div>
                         {comm.subject && (
                           <p className="text-sm font-medium mb-1">Betreff: {comm.subject}</p>
