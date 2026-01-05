@@ -14,10 +14,16 @@ export function Footer() {
         const { data, error } = await supabase
           .from("app_settings")
           .select("value")
-          .eq("key", "legal_company_name")
+          .eq("key", "company_name")
+          .limit(1)
           .maybeSingle();
 
-        if (!error && data?.value) {
+        if (error) {
+          console.error("Error fetching company name:", error);
+          return;
+        }
+
+        if (data?.value) {
           setCompanyName(data.value);
         }
       } catch (err) {
