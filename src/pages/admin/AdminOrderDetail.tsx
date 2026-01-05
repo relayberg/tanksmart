@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type MouseEvent } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import AdminLayout from '@/components/admin/AdminLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -374,16 +374,39 @@ export default function AdminOrderDetail() {
   };
 
   const handleRefreshSmsStatus = async (comm: Communication) => {
-    const metadata = comm.metadata as { seven_message_id?: string } | null;
-    const messageId = metadata?.seven_message_id;
-    
+    const metadata = (comm.metadata || {}) as any;
+
+    let messageId: string | undefined =
+      metadata.seven_message_id ||
+      metadata.raw_response?.messages?.[0]?.id ||
+      metadata.raw_response?.messages?.[0] ||
+      (() => {
+        if (typeof metadata.raw_text === 'string') {
+          const parts = metadata.raw_text.trim().split(/\s+/);
+          // e.g. "100\n77229318510"
+          if (parts.length >= 2 && parts[0] === '100') return String(parts[1]);
+        }
+        return undefined;
+      })();
+
+    // If we don't have a messageId, allow manual paste from Seven dashboard
     if (!messageId) {
-      toast({
-        title: 'Fehler',
-        description: 'Keine Message-ID vorhanden',
-        variant: 'destructive',
-      });
-      return;
+      const input = window.prompt(
+        'Keine Message-ID gespeichert. Bitte Seven Message-ID (msg_id) einfügen:'
+      );
+
+      if (!input) return;
+
+      messageId = input.trim();
+
+      const { error: metaError } = await supabase
+        .from('order_communications')
+        .update({ metadata: { ...metadata, seven_message_id: messageId } })
+        .eq('id', comm.id);
+
+      if (metaError) {
+        console.error('Error saving manual messageId:', metaError);
+      }
     }
 
     setRefreshingSmsId(comm.id);
@@ -393,13 +416,16 @@ export default function AdminOrderDetail() {
         body: {
           action: 'sms_status',
           orderId: order?.id,
-          messageId: messageId,
+          messageId,
         },
       });
 
       if (error) throw error;
 
-      toast({ title: 'SMS-Status aktualisiert', description: `Status: ${data.status}` });
+      toast({
+        title: 'SMS-Status aktualisiert',
+        description: `Status: ${data.status}`,
+      });
       fetchCommunications();
     } catch (error) {
       console.error('Error refreshing SMS status:', error);
@@ -416,7 +442,7 @@ export default function AdminOrderDetail() {
   const getSmsStatusBadge = (status: string, comm: Communication) => {
     const isRefreshing = refreshingSmsId === comm.id;
     
-    const handleClick = (e: React.MouseEvent) => {
+    const handleClick = (e: MouseEvent<HTMLButtonElement>) => {
       e.stopPropagation();
       handleRefreshSmsStatus(comm);
     };
