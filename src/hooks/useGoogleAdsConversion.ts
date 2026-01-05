@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { useAppSettings } from "@/context/AppSettingsContext";
 
 interface ConversionData {
   orderNumber: string;
@@ -8,55 +8,29 @@ interface ConversionData {
 
 /**
  * Hook to trigger Google Ads conversion tracking on the success page.
- * Fetches the conversion IDs from the database and fires the gtag event.
+ * Uses the central AppSettingsContext for configuration.
  */
 export function useGoogleAdsConversion({ orderNumber, totalPrice }: ConversionData) {
+  const { googleAds, isLoading } = useAppSettings();
   const hasFired = useRef(false);
 
   useEffect(() => {
-    if (hasFired.current) return;
-    
-    async function fireConversion() {
-      try {
-        const { data: integration } = await supabase
-          .from("api_integrations")
-          .select("config, is_active")
-          .eq("provider", "google_ads")
-          .maybeSingle();
+    if (isLoading || hasFired.current) return;
+    if (!googleAds.isActive || !googleAds.conversionId) return;
 
-        if (!integration?.is_active) {
-          return;
-        }
+    if (typeof window.gtag !== "function") return;
 
-        const config = integration.config as { conversion_id?: string; conversion_label?: string };
-        const conversionId = config?.conversion_id;
-        const conversionLabel = config?.conversion_label;
+    const sendTo = googleAds.conversionLabel
+      ? `${googleAds.conversionId}/${googleAds.conversionLabel}`
+      : googleAds.conversionId;
 
-        if (!conversionId) {
-          return;
-        }
+    window.gtag("event", "conversion", {
+      send_to: sendTo,
+      value: totalPrice,
+      currency: "EUR",
+      transaction_id: orderNumber,
+    });
 
-        if (typeof window.gtag !== "function") {
-          return;
-        }
-
-        const sendTo = conversionLabel 
-          ? `${conversionId}/${conversionLabel}`
-          : conversionId;
-
-        window.gtag("event", "conversion", {
-          send_to: sendTo,
-          value: totalPrice,
-          currency: "EUR",
-          transaction_id: orderNumber,
-        });
-
-        hasFired.current = true;
-      } catch {
-        // Silently fail - tracking is non-critical
-      }
-    }
-
-    fireConversion();
-  }, [orderNumber, totalPrice]);
+    hasFired.current = true;
+  }, [orderNumber, totalPrice, googleAds, isLoading]);
 }
