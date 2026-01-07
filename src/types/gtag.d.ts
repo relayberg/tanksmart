@@ -64,4 +64,5 @@ declare function gtag(
 interface Window {
   dataLayer: unknown[];
   gtag: typeof gtag;
+  __gtagReady?: boolean;
 }
