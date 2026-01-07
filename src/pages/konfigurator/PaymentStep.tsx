@@ -10,6 +10,7 @@ import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Droplet, User, MapPin, Calendar, CreditCard, Loader2 } from "lucide-react";
 import { SEO } from "@/components/SEO";
+import { saveConversionData } from "@/hooks/useGoogleAdsConversion";
 
 export default function PaymentStep() {
   const navigate = useNavigate();
@@ -80,6 +81,16 @@ export default function PaymentStep() {
       if (!data?.success) {
         throw new Error(data?.error || 'Unbekannter Fehler');
       }
+
+      // Store customer data for Enhanced Conversions before resetting order
+      saveConversionData({
+        email: order.email,
+        phone: order.phone,
+        firstName: order.firstName,
+        lastName: order.lastName,
+        city: order.city,
+        postalCode: order.postalCode,
+      });
 
       // Store totalPrice for conversion tracking before resetting order
       const finalTotalPrice = order.totalPrice;
